@@ -1,0 +1,1828 @@
+{
+  "s-1": {
+    "plain_english": "This act is named the Digital Personal Data Protection Act, which starts being enforced on the day the government decides. The act covers all parts from the moment it begins until the end.",
+    "questions": [
+      "In what documents can I find when this act will start applying?",
+      "What happens if my data gets leaked before the act starts enforcing?",
+      "How do I know if a part of the act applies to me right away or later?",
+      "Do we need to make any changes in our business practices because of this new law?",
+      "When does the government decide which parts of the act begin immediately and when they start applying later?",
+      "What happens if my data is leaked after the act starts enforcing but before I know about it?",
+      "How can I find out what part of the act applies to me based on where I live or work?",
+      "Can we ask for a change in how long certain parts of this act apply, like making some parts start immediately instead of later?"
+    ]
+  },
+  "s-2": {
+    "plain_english": "This Act defines key terms like who can give and manage consent, what personal data is, and how certain uses are allowed. It also specifies roles for people involved with handling personal information.",
+    "questions": [
+      "In this act, who decides the purpose of using personal data? How do I give my consent to someone else processing my personal data?",
+      "What does 'digital personal data' mean in simple terms? Can it be deleted if it's stored digitally?",
+      "How can a child or person with disability manage their own data if they don't have legal guardianship over them? Who is the Data Principal then?",
+      "Who is responsible for ensuring that personal data is processed fairly and securely? What are their duties?",
+      "What happens when there’s a problem with how someone handles my personal data? How do I report it or get help?",
+      "How can I find out what kind of uses are considered 'certain legitimate uses' of my personal data? Who decides these?",
+      "Who is the Data Fiduciary and who is the Data Processor in this act? What's their role in handling personal information?",
+      "If a child’s parents give consent for something, does that mean they can't withdraw it later unless they're legally allowed to do so?"
+    ]
+  },
+  "s-3": {
+    "plain_english": "This law applies to how companies handle digital information about people living in India and outside India if it's related to selling things or services here. It doesn't cover personal info someone uses for themselves or that's already shared publicly.",
+    "questions": [
+      "What activities does this law apply to when dealing with data from Indians?",
+      "When can a company process data collected outside of India under this law?",
+      "Which types of personal information are exempted from the law?",
+      "How do I know if my blog post about myself would be covered by this law?",
+      "If I share my personal data on social media, does that mean it's not protected by this law anymore?",
+      "What happens if a company collects data for their own use (like an individual)?",
+      "Does this law apply to all types of information related to goods or services offered in India?",
+      "How can someone ensure their data is covered under the law when shared publicly?"
+    ]
+  },
+  "s-4": {
+    "plain_english": "To use someone's personal information, a company needs to follow rules in this Act and only for reasons that are allowed. They can do it if you say they can or if the reason isn't against the law.",
+    "questions": [
+      "What purposes are considered lawful under this act?",
+      "How can I give permission for my data to be used?",
+      "Are there any activities that are forbidden by law and therefore not allowed?",
+      "Do companies need explicit consent from me before using my personal information?",
+      "In what situations might a company use my data without needing my direct permission?",
+      "If something goes wrong with how they handle my data, can I ask them to delete it?",
+      "What happens if the company uses my data for an activity that isn't explicitly stated as lawful in this act?",
+      "Can companies process my data even if they don’t have consent or a lawful purpose?"
+    ]
+  },
+  "s-5": {
+    "plain_english": "When a bank asks for your permission to use your personal information, they must tell you what data they want to use and why, how you can change your mind about sharing that info, and where you can report any issues with them. If you already gave them permission before this new law started, they need to let you know the same things within a few days. They also have to offer to show you the notice in English or another language if you prefer.",
+    "questions": [
+      "Can I ask for my personal data information in different languages?",
+      "How long do banks have to tell me about their plans with my info after this new law starts?",
+      "What happens if I don't want them to use my personal data anymore?",
+      "Where can I go if I think a bank broke the rules about using my personal data?",
+      "Can I see what information the bank has on me and how they plan to use it?",
+      "How do I tell the bank that I no longer agree with them using my personal data?",
+      "What does the law say about banks telling customers when they're collecting their personal info?",
+      "Do all banks have to follow these rules, or just some of them?"
+    ]
+  },
+  "s-5-1": {
+    "plain_english": "When you ask your bank about sharing your information, they need to tell you what kind of information they want and why, how you can choose whether to share it or not, and where you can report if something goes wrong.",
+    "questions": [
+      "What personal data does the bank want from me?",
+      "Why do they want this information from me?",
+      "How can I decide if I want to give them my information?",
+      "Where can I go if there's a problem with how they handle my information?",
+      "Do I have to agree before they use my information for something new?",
+      "How will I know when they're using my information in ways that aren't clear right away?",
+      "What happens if I don't want the bank to share some of my information anymore?",
+      "Can I ask them not to use my information for certain things?"
+    ]
+  },
+  "s-5-2": {
+    "plain_english": "If a customer gives permission for their personal information to be used before this new law goes into effect, the company must tell them about it promptly. They need to explain what kind of information was shared, why it was needed, and how customers can ask for their data or report any issues. The company can keep using the data until the customer says they don’t want it anymore.",
+    "questions": [
+      "Can I get a copy of my personal info from this company?",
+      "How do I tell the company to stop using my information?",
+      "What happens if my personal data gets leaked? Do I have to report it?",
+      "Do I need to give permission again for them to use my information now that there's new rules in place?",
+      "How can I make sure they delete my old data when they're done with it?",
+      "Who do I contact if something goes wrong with how they handle my personal info?"
+    ]
+  },
+  "s-5-3": {
+    "plain_english": "The company has to let you see your information in either English or a language listed in our special book, if you ask for it.",
+    "questions": [
+      "What languages can I choose my data notice to be in?",
+      "Do I have to pay extra to get my data notice in another language besides English?",
+      "Can the company tell me what languages are allowed in their special book?",
+      "How long does it take for the company to give me access to my data notice?",
+      "If I want a different version of my data notice, do I need to ask or can they provide one automatically?",
+      "Do I have to agree to receive my data notice in another language besides English?",
+      "Is there any cost involved if I choose a language other than English for my data notice?",
+      "How many languages are listed in the company's special book where you can get your data notice?"
+    ]
+  },
+  "s-6": {
+    "plain_english": "The new rules say that when a business asks for your permission to use your information, you need to give them clear yes or no. They must only ask about what they really need and not include things that aren't allowed by the law. If someone gives their permission, they can always change their mind later without too much trouble. But if they take back their permission, it won’t make any of the old information they used invalid.",
+    "questions": [
+      "Can I choose which language my consent is given in?",
+      "What happens if I want to stop giving my data away now?",
+      "Is there someone I can talk to if I have questions about using my data?",
+      "Does it matter how the business asks for my permission? Can they just assume I agree?",
+      "Can a company use my information even after I say no, as long as they had my okay before?",
+      "If I change my mind and want to take back my consent, does that make all their old uses of my data illegal now?",
+      "Is there someone who can help me if I have problems with how the business is using my personal information?"
+    ]
+  },
+  "s-6-1": {
+    "plain_english": "The person using a service like Y needs to give permission clearly and unambiguously for their information to be used in certain ways. They must do this willingly, not out of fear or pressure. The permission they give can only cover what is needed for the specific purpose, like getting telemedicine services.",
+    "questions": [
+      "Can I choose which parts of my phone contacts Y can access?",
+      "How do I know if giving consent means all my contact info will be shared?",
+      "Is it okay to share some but not all of my medical information with Y?",
+      "What happens if I change my mind about sharing more data after I've given consent?",
+      "Can I ask Y to delete the personal data they have collected from me?",
+      "If Y collects too much info, can I ask them to limit it?",
+      "Is there a way for me to check what information Y has on me?",
+      "What if Y uses my data in ways that weren't part of what I originally agreed to?"
+    ]
+  },
+  "s-6-2": {
+    "plain_english": "If you give an insurer permission to use your personal information and also agree not to complain if something goes wrong, that part can't be used because it breaks the rules.",
+    "questions": [
+      "What happens if I consent to my data being processed but also waive my right to report a problem? Can I still file a complaint later?",
+      "How do I know which parts of my consent are allowed and which aren’t under this law?",
+      "If an insurer asks for permission to use my data, can they also ask me not to complain if something goes wrong with the service?",
+      "Can I change or revoke my consent without any penalties after giving it initially?",
+      "What does 'processing' mean in relation to my personal data when buying insurance online?",
+      "How do I know what parts of my consent are valid and which ones might be invalid due to this law?",
+      "If I give permission for an insurer to use my data, can they also prevent me from complaining if things go wrong with the service?",
+      "Can I withdraw my consent for processing my personal data at any time without affecting other parts of my consent?"
+    ]
+  },
+  "s-6-3": {
+    "plain_english": "Every time you ask someone for their permission (consent) about how we use their information, you need to explain it in simple words they can understand. You also have to offer them an option to read the explanation in English or another language that is allowed by law. And if they want, you should give them a way to get in touch with someone who helps take care of their privacy information.",
+    "questions": [
+      "How do I know if my request for consent was understood properly?",
+      "Can I choose which language the explanation about using my data is given in?",
+      "Who can I contact if I have more questions about how you use my personal information?",
+      "Is it true that I always get an option to read explanations in English or another approved language?",
+      "What happens if someone doesn't understand the request for consent and asks for help understanding it?",
+      "Can I ask to see all of my personal data at any time, and how do I do that?",
+      "If there's a problem with how you use my information, can I ask you to delete it from your records?",
+      "Is there someone specific who helps me if I have privacy questions or concerns?"
+    ]
+  },
+  "s-6-4": {
+    "plain_english": "If a customer gives permission for their information to be used by a company, they can change their mind and stop that use anytime without making it hard or complicated.",
+    "questions": [
+      "Can I withdraw my consent at any time? How do I do that?",
+      "Is withdrawing my consent as easy as giving the initial permission?",
+      "What happens to my data if I decide to withdraw my consent suddenly?",
+      "Does withdrawing my consent affect other people's information too?",
+      "If I change my mind, can I still use my personal data for some purposes?",
+      "How long does it take for a company to process my withdrawal of consent?",
+      "Can I ask the company to delete my personal data if I withdraw consent?",
+      "Does withdrawing consent mean I have to give new permission every time?"
+    ]
+  },
+  "s-6-5": {
+    "plain_english": "If you change your mind about how we handle your personal information, we'll follow what you say. But if we had your permission to use that info before you changed it, we can still do that even after you tell us not to anymore.",
+    "questions": [
+      "What happens when I decide not to let a company use my personal data any more?",
+      "Can the company keep using my information for things I've already agreed to, like orders I've made and paid for?",
+      "If I change my mind about sharing my data with your app or website, can you still process my order payments?",
+      "Do I have to delete all of my account information if I want to stop letting a company use it?",
+      "Can the company continue to send me emails even after I tell them not to share my personal info anymore?",
+      "How do I know what kind of data processing is allowed even after I withdraw consent?",
+      "If I change my mind, can the company still process my order details for goods I've already paid for?",
+      "Do companies have to delete all my information if they no longer need it after I tell them not to use it?"
+    ]
+  },
+  "s-6-6": {
+    "plain_english": "If a customer changes their mind about having their information shared with another company, the original company must stop sharing that information right away unless it's needed for other reasons or allowed by law.",
+    "questions": [
+      "What happens if I change my mind about how my data is used? Do I have to give permission again?",
+      "If I download a new app and don't want emails anymore, do they still send me bills through the old method?",
+      "Do I need to ask permission every time someone wants to use my information for something else?",
+      "When can companies keep using my personal info even if I changed my mind? Only when it's allowed by law.",
+      "How long does a company have to stop sharing my data after I say no?",
+      "If they're not sure, what should they do with my old emails about bills until they decide?",
+      "Do companies need special permission to use my information for things like sending bills even if I don't want them to anymore?",
+      "What happens if the new way of using my data is different from how it was before?"
+    ]
+  },
+  "s-6-7": {
+    "plain_english": "The person whose data is being handled (we'll call them Customer) can control how their information is used by giving, changing, checking on, or taking away their permission for someone else (the Data Fiduciary) to use it. They do this through a special tool called the Consent Manager.",
+    "questions": [
+      "Can I change my mind about how my data is used?",
+      "Who can I talk to if I want to give more permissions to the company using my information?",
+      "How do I know what changes have been made when I update my settings in the Consent Manager?",
+      "Is there a way for me to delete all my data from the company if I don't want them to use it anymore?",
+      "Can I ask the company to review how they are managing my data at any time?",
+      "How do I know who is using my information and what they can do with it after I give consent?",
+      "Is there someone I can contact directly through the Consent Manager if I have questions about my data rights?",
+      "What happens if I want to withdraw my consent for something specific, like sharing my location?"
+    ]
+  },
+  "s-6-8": {
+    "plain_english": "The person who manages your data must answer to you and should act according to your wishes when it comes to managing your personal information.",
+    "questions": [
+      "Who is responsible for managing my data now?",
+      "Can I change the person in charge of my data at any time?",
+      "What happens if the data manager doesn't follow what I want them to do with my data?",
+      "How can I make sure the data manager is doing a good job?",
+      "Is there someone else who should be involved when it comes to managing my data?",
+      "Can I ask for copies of all the personal information that has been collected about me?",
+      "What if I don't agree with how my data is being used or shared by the manager?",
+      "How can I make sure my data is kept safe and not leaked?"
+    ]
+  },
+  "s-6-9": {
+    "plain_english": "Every company that acts as a Consenting Manager must register with the Board following any rules they set. They have to show they can handle things properly financially too.",
+    "questions": [
+      "What are the specific ways I need to register with the Board for being a Consent Manager?",
+      "How do financial requirements affect my ability to be a Consent Manager?",
+      "Can you explain what 'technical conditions' mean in this context?",
+      "Do we need to provide proof of our operational capabilities when registering?",
+      "Why might there be other conditions besides technical, operational, and financial ones that the Board could impose?",
+      "What kinds of rules can the Board make for registration as a Consent Manager?",
+      "How does being financially sound relate to my ability to manage consents effectively?",
+      "Can you clarify what 'other conditions' refer to in this section?"
+    ]
+  },
+  "s-6-10": {
+    "plain_english": "If someone asks about how we got permission to use their personal information, we need to show that we told them about it and they said yes.",
+    "questions": [
+      "In what ways did you inform the customer about using their data?",
+      "How do I know my consent was given correctly according to this act?",
+      "Do I have proof that I informed the customer before getting permission for their data use?",
+      "What does 'in accordance with the provisions of this Act' mean in our context?",
+      "Can you provide an example of a notice we gave to customers about using their personal information?",
+      "How do we ensure that the consent given by customers is valid and follows all rules set by the act?",
+      "Do I need any specific documents or records to prove that I informed customers about data use and they gave consent?",
+      "]}user                                                                                                                                                                                                                                 "
+    ]
+  },
+  "s-7": {
+    "plain_english": "A Data Fiduciary can use personal data provided voluntarily by a customer for purposes like sending receipts, helping find rental accommodation, or processing benefits based on what was previously agreed. They also have permission to use the data if it's in digital form and part of records kept by government agencies.",
+    "questions": [
+      "Can I get my receipt sent via text message?",
+      "If I give my personal info for finding a place to live, can they share that with other companies or just keep it private?",
+      "Do I need to agree each time the government uses my data for benefits? Or do I have to say no if I don't want them to use it in future?",
+      "Can the government look at my medical records from a previous pregnancy to help me get more support now?",
+      "If they keep all this information, can I ask them to delete or change any part of it that's not needed anymore?",
+      "Does sharing my personal data mean I have to agree forever? Can I take it back if I don't want to share more in the future?",
+      "Can the government use my old medical records from when I was pregnant to help me get benefits now, even though I didn't give them permission then?",
+      "If they need to process personal data for a benefit, do they have to follow certain rules about how that happens?"
+    ]
+  },
+  "s-8": {
+    "plain_english": "A Data Fiduciary must follow all the rules in this Act and any other agreements, even if the customer doesn't do their part. They can use another company to handle some data processing as long as there's a valid contract. If they process personal data that affects someone or might be shared with another company, they need to make sure it’s correct and up-to-date. They also have to protect this data from getting lost or stolen. If something does happen where their data is lost, they must tell the people who made the rules and those affected.",
+    "questions": [
+      "Can a Data Fiduciary use another company to process personal data without a contract?",
+      "How do we ensure that the personal data processed by our company stays correct and up-to-date?",
+      "What steps should we take to protect our customers' personal information from being lost or stolen?",
+      "Do we need to tell anyone if there's been a problem with our data, like it getting lost or stolen?",
+      "Can we keep someone's personal data longer than what the law requires?",
+      "How do we make sure that when we delete someone's data, any other company we work with also deletes their copy of it?",
+      "What should we do if someone wants us to erase their information from our records?",
+      "Do we need to tell people about a data breach and how they can get their personal information back?"
+    ]
+  },
+  "s-8-1": {
+    "plain_english": "A company that handles personal data must follow all the rules set by law even if they didn't agree to do so or if someone doesn't cooperate with them.",
+    "questions": [
+      "Who is responsible for making sure our company follows all the privacy laws?",
+      "Does this mean we can't change how we handle customer information as long as it's not against the law?",
+      "What happens if a Data Processor breaks a rule - do they still have to follow up with us?",
+      "Can customers ask us to delete their personal information from our records?",
+      "How does this affect what we agree to with other companies who help us process data?",
+      "If someone leaks sensitive customer info, can we be held accountable even if it wasn't our fault?",
+      "Do we need to tell customers about all the ways we use and share their personal information?",
+      "Can we get in trouble for not following these privacy rules, no matter what?"
+    ]
+  },
+  "s-8-2": {
+    "plain_english": "A company can hire another firm to handle their customer's personal information if it helps them offer products or services, but they need to have a proper agreement in place first.",
+    "questions": [
+      "In what kind of agreements do companies need when using Data Processors?",
+      "How does a valid contract ensure that the Data Processor uses my data correctly?",
+      "What activities can a company outsource to a Data Processor for customer goods and services?",
+      "Do I have any rights if my personal information is processed by someone else on behalf of the original company?",
+      "Can I ask the original company to delete my data from their records after it's been processed by a Data Processor?",
+      "How do I know the Data Processor will use my data securely when they're handling it for me?",
+      "What happens if the Data Processor breaches any terms in the contract and mishandles my personal information?",
+      "Do companies need to inform customers about using a Data Processor for their services?"
+    ]
+  },
+  "s-8-3": {
+    "plain_english": "If a company processes customer information that could influence decisions about them or be shared with other companies, they need to make sure this information is correct, complete, and matches up well.",
+    "questions": [
+      "How do we ensure our data is accurate when making important decisions?",
+      "What steps should we take to keep our personal information consistent across different systems?",
+      "Can you explain what it means for our data to be 'complete' in this context?",
+      "Who needs to review and verify the accuracy of our customer data before sharing with other companies?",
+      "How can we make sure that all the relevant parts of our customer data are included when used by a Data Fiduciary?",
+      "What happens if we find errors or inconsistencies in our customer data? Do we need to fix them ourselves, or should someone else do it?",
+      "Is there any specific way we should format or structure our customer information so that it is consistent across different systems and uses?",
+      "Can you give an example of how a Data Fiduciary might verify the completeness, accuracy, and consistency of our personal data?"
+    ]
+  },
+  "s-8-4": {
+    "plain_english": "The company needs to use good security practices to make sure they follow all the rules in our new data protection law.",
+    "questions": [
+      "In what ways should we secure our customer's information?",
+      "How can we better protect our customers' personal details from getting leaked?",
+      "What steps do we need to take to ensure we comply with all parts of this new act?",
+      "Do you think we are doing enough to keep our customers' data safe, or is there more we could be doing?",
+      "Can you explain what 'appropriate technical and organisational measures' means in simple terms?",
+      "How can we make sure we're following the rules about protecting customer information correctly?",
+      "What kind of security checks do we need to put in place to ensure compliance with this act?",
+      "Do you think our current data protection measures are strong enough, or should we consider getting an outside expert to review them?"
+    ]
+  },
+  "s-8-5": {
+    "plain_english": "The person who handles your information (Data Fiduciary) needs to keep that info safe and secure from being shared accidentally or without permission. They need to use good ways to protect it so there's less chance of someone getting your private stuff wrong.",
+    "questions": [
+      "In case my personal data gets leaked, what should I do?",
+      "How can I make sure my Data Fiduciary uses strong security measures for my information?",
+      "What happens if a breach does occur and my data is leaked? Do they have to tell me or the authorities?",
+      "Do I need to give permission every time my Data Fiduciary shares my personal info with someone else?",
+      "If something goes wrong, can I ask them to delete all my personal data from their records?",
+      "How do I know if a breach has happened and what steps should I take next?",
+      "Can I demand compensation if my personal data is mishandled by the Data Fiduciary?",
+      "Do I have any rights to get copies of my personal information that they hold?"
+    ]
+  },
+  "s-8-6": {
+    "plain_english": "If there's a problem with how we handle your information (a personal data breach), we have to tell you and the government right away.",
+    "questions": [
+      "What happens if my company has an issue with our customer’s info?",
+      "How do I know if my business is being notified about a data leak?",
+      "Who do I contact if there's been a personal data breach at my company?",
+      "Can you tell me how and when we need to report a data breach to the government?",
+      "What information will be included in the notification of a data breach?",
+      "How can I find out more about what constitutes a personal data breach?",
+      "Who do I contact if I think there's been a leak of my customer’s info?",
+      "When should we notify affected customers and the Board after a data breach?"
+    ]
+  },
+  "s-8-7": {
+    "plain_english": "A Data Fiduciary must delete customer information if the customer asks to or when it's clear that the reason for keeping the info isn't needed anymore. If a rule says they need to keep certain data, they can do so even if the customer wants it gone.",
+    "questions": [
+      "Can I ask my e-commerce provider to remove my personal details after using their service?",
+      "If I close my account with a bank, will they still have access to my financial information for years after closing?",
+      "When can my data be deleted by my online marketplace if I no longer want them to use it?",
+      "Can a bank keep my banking records even though I closed my account? Why or why not?",
+      "If I change jobs and don’t want my old company to have access to my personal information, what do I need to do?",
+      "What happens if I ask for my data to be deleted by an e-commerce site, but they say it's required by law?",
+      "Can a bank keep track of my past transactions even after I close my account? Why or why not?",
+      "If I delete my personal information from a service provider, can the provider still use that info if they were already using it for something else?"
+    ]
+  },
+  "s-8-8": {
+    "plain_english": "If the customer doesn't ask the data fiduciary to do what they agreed to do with their personal information, or if they don’t exercise their rights like being able to see or delete their own data after a certain time, then the original purpose for handling that data is considered no longer valid.",
+    "questions": [
+      "When should I contact my data fiduciary about using my personal info?",
+      "How long do I have to use my right to access my data if needed?",
+      "Can different people have different time limits to use their rights?",
+      "What happens if I don't exercise any of my data rights anymore?",
+      "Who decides how long I can keep using my data after it's been processed?",
+      "Does the length of time change depending on what kind of personal info I have?",
+      "Can some people get more time to use their rights than others?",
+      "What if I don't contact my fiduciary or exercise my rights for a long time?"
+    ]
+  },
+  "s-8-9": {
+    "plain_english": "The company needs to share their contact information for someone like a privacy officer so customers can ask questions about how their personal information is handled.",
+    "questions": [
+      "In case I have questions about my personal info, who do I contact within the company?",
+      "How can I find out who handles my data and what they do with it?",
+      "Do you have a person designated to answer my queries about my personal data processing?",
+      "If there's an issue with how my data is used, where should I go for help?",
+      "What information will be shared if someone asks me about my personal data processing?",
+      "Who can I contact within the company to learn more about their privacy practices?",
+      "How do I get in touch with a person who answers questions from customers about their personal data?",
+      "If there's something wrong with how they're using my data, where should I report it?"
+    ]
+  },
+  "s-8-10": {
+    "plain_english": "The company needs to set up a way to fix problems that customers might have with their data, like if they feel their information wasn't handled properly.",
+    "questions": [
+      "In case I'm unhappy with how my data is being used, what can I do?",
+      "How does the company plan to help me if I think my personal info was mishandled?",
+      "What steps are in place to make sure customer concerns about privacy issues are addressed?",
+      "Do customers have a way to contact someone within the company who can resolve their privacy complaints directly?",
+      "If something goes wrong with my data, how quickly will the company look into it and fix any problems?",
+      "How can I ensure that my personal information is being used as intended by the company?",
+      "Is there an official process for customers to report issues with their data privacy rights?",
+      "What happens if a customer feels they've been treated unfairly regarding their personal data?"
+    ]
+  },
+  "s-8-11": {
+    "plain_english": "If a customer hasn't talked to us about using their data for something specific, we don’t have to do it unless they ask us to.",
+    "questions": [
+      "What happens if I never contact you but my data is used for a purpose? Do I need to agree first?",
+      "If I haven't contacted you in person or by any form of communication, can you still use my data for something specific?",
+      "Do I have to give permission each time you plan to use my information for a new reason?",
+      "What if someone else uses your services and doesn’t contact me but they want to use my data? Can you do that without asking me first?",
+      "If I haven't communicated with you, can you still share my data with other companies or people?",
+      "Do I need to be contacted by you before you start using my information for a specific purpose?",
+      "What if someone uses your services and doesn’t contact you but wants to use my data? Can you do that without asking me first?",
+      "If I haven't talked to you, can you still use my data even if it’s for something important?"
+    ]
+  },
+  "s-9": {
+    "plain_english": "Before a company can use personal information about kids, they need to get permission from their parents or guardians. They also can't do anything harmful to children's well-being and shouldn’t track or advertise at them. There are some exceptions for certain types of companies under specific conditions. If the government thinks a company is doing it right, they might let that company use more freedom with kids' data once they get older.",
+    "questions": [
+      "Can we still collect personal information from children if their parents give us permission?",
+      "What happens if our company does something bad to a child's well-being by using their data?",
+      "Are we allowed to track or advertise at children, and how do we know if it’s okay?",
+      "Is there any way our company can be exempt from following some rules about kids' data once they reach a certain age?",
+      "What should we do if someone thinks our company isn't handling kids' data safely?",
+      "Can you tell me more about what kind of companies might get an exemption for kids' data?",
+      "How does the government decide when it's okay to let a company handle kids' data without following all the rules?"
+    ]
+  },
+  "s-9-1": {
+    "plain_english": "The person who handles your data needs to get permission from a parent or legal guardian before they can use any personal information about children or people with disabilities unless there's already an agreement in place.",
+    "questions": [
+      "What happens if I don't give consent for my child's data to be processed by the fiduciary?",
+      "How do I provide consent for my disabled child's data processing, and who decides that - the parent or guardian? ",
+      "Can a guardian override a parent's decision on behalf of a child when it comes to personal data processing?",
+      "Do we need to follow any specific rules about how to get consent from parents or guardians?",
+      "What if there's no parent available for my child's data processing, can I still give consent myself?",
+      "How do I know if the person handling my data has obtained the right kind of consent from a guardian or parent?",
+      "Can someone else like an attorney act on behalf of a child to provide consent for their personal data processing?",
+      "If there is already an agreement in place, does that mean we don't need to get any more consent?"
+    ]
+  },
+  "s-9-2": {
+    "plain_english": "A company can't handle your kids' information in ways that might make them feel bad or sick, like sharing their photos without permission.",
+    "questions": [
+      "What should I do if my child's data is being used in a way that makes me uncomfortable?",
+      "How can I ensure my personal information about my children isn't shared with others who shouldn't have access to it?",
+      "Do companies need to ask for permission before using any of our kids' photos or videos online?",
+      "If something happens, like an accident where sensitive child info gets out, what should I do?",
+      "What steps does the company take to ensure they don’t use my children’s data in ways that could harm them?",
+      "How can we make sure our personal information about our children is kept safe and not misused by anyone?",
+      "Is it okay for companies to ask us if they can use photos of our kids, or do they need permission every time?",
+      "If a company uses my child's data without asking, what should I do to protect them?"
+    ]
+  },
+  "s-9-3": {
+    "plain_english": "The person in charge of data can't watch over kids' activities online or send them ads that seem to be just for kids.",
+    "questions": [
+      "What should a company do if they find out someone under 13 is using their service?",
+      "How does this rule affect how companies use cookies and trackers on websites aimed at children?",
+      "Do I need to change anything about my website's privacy policy because of this section?",
+      "Can we still collect data from kids for marketing purposes, but just not target them specifically?",
+      "What happens if a company accidentally collects data from someone under 13? What should they do next?",
+      "How does this rule apply when our service is used by both adults and children?",
+      "Do companies need to train their staff on how to handle data of minors differently?",
+      "Can we use analytics tools that track user behavior, but only for people over 13?"
+    ]
+  },
+  "s-9-4": {
+    "plain_english": "This section means that special rules apply when businesses handle the information of children. There are no specific rules about what can happen with their data yet; those will be made by people who know a lot more than us.",
+    "questions": [
+      "In which situations do these rules not apply to kids' personal info?",
+      "What conditions might make it okay for companies to use child data?",
+      "How would the government decide if they want to change how this works for children's data?",
+      "Do we need to delete any of our kid customers' information right away?",
+      "If a company has a special reason, can they still handle kids' data differently?",
+      "Who decides what is allowed when it comes to using kids' personal info?",
+      "What happens if someone breaks the rules about handling child data?",
+      "How do we know if a company is following these new rules for children's data?"
+    ]
+  },
+  "s-9-5": {
+    "plain_english": "The government can tell a company they don't have to follow some rules about how they handle kids' personal information if they prove they're doing it safely.",
+    "questions": [
+      "In what situations would a company be exempt from certain data protection rules for handling children's data?",
+      "How does the government decide which rules companies are exempt from?",
+      "What proof do companies need to show that their data processing is safe for children?",
+      "Do companies have to notify anyone if they're told they don't have to follow some rules anymore?",
+      "Can a company request more time before being exempt from certain rules?",
+      "Why would the government want to make it easier for companies to handle kids' data safely?",
+      "How does the government ensure that companies are actually following safety measures when handling children's personal information?",
+      "What happens if a company is found not to be processing children's data safely after they're told they can be exempt?"
+    ]
+  },
+  "s-10": {
+    "plain_english": "The act makes certain data companies or groups very important by checking their handling of personal information. These significant data fiduciaries must have someone who understands privacy rules and can fix any problems. They also need to hire an independent person to check if they are following the rules properly. The significant data fiduciaries must do regular checks on how they use people's private information, just like a doctor does health checks.",
+    "questions": [
+      "Who needs to appoint a Data Protection Officer?",
+      "What should the Data Protection Officer do?",
+      "Can the Data Protection Officer be based outside of India?",
+      "Does the Data Protection Officer need to report to anyone else besides the Board of Directors?",
+      "How often does the Significant Data Fiduciary need to have an audit done by an independent auditor?",
+      "What should a periodic Data Protection Impact Assessment include?",
+      "Is there anything specific that must be prescribed for regular audits?",
+      "Does the act mention what happens if someone's data is leaked?"
+    ]
+  },
+  "s-10-1": {
+    "plain_english": "The government can decide which big companies or groups are considered important for protecting personal data based on how much sensitive information they handle, how it could affect people's rights, and other important factors like keeping India safe.",
+    "questions": [
+      "Who gets classified as a 'Significant Data Fiduciary'?",
+      "What kinds of things does the government look at to decide who is a Significant Data Fiduciary?",
+      "Why do they consider how much sensitive information companies handle when deciding who is important for data protection?",
+      "Does it matter if a company's data could affect India's sovereignty or integrity?",
+      "How does the risk to electoral democracy factor into this decision?",
+      "What about security of the State—does that play a role in classification?",
+      "Are there other factors besides these mentioned by the government when deciding who is important for protecting personal data?",
+      "Can you give an example of how they might classify different companies as Significant Data Fiduciaries?"
+    ]
+  },
+  "s-10-2": {
+    "plain_english": "The big company has to pick someone named the Data Protection Officer who will help them follow the rules about protecting personal information. This person needs to live in India and report directly to their bosses. They also need a data auditor to check if they are following all the rules properly. The big company must do regular checks on how it handles people's private stuff, just like you might have someone look over your homework to make sure you're doing everything right.",
+    "questions": [
+      "What should I do if I think my personal information was shared without permission by a big company? Who can help me?",
+      "How often does the big company need to check its own handling of personal data and report back on it?",
+      "Who is in charge of making sure the big company follows all the rules about protecting people's private information, and how do I contact them if there’s an issue?",
+      "What kind of things should a Data Protection Officer look at when they're checking how the big company handles personal data?",
+      "How can I make sure my personal information stays safe with the big company? What measures does the law say they need to take?",
+      "Can anyone else besides the Data Protection Officer and auditor check on how the big company is handling personal data, or do only these two people have that responsibility?"
+    ]
+  },
+  "s-11": {
+    "plain_english": "The person whose information we're talking about (we'll call them Customer) can ask their trusted company to show them a summary of their personal data and how it's being used. They also have the right to know who else has shared this information with other companies, along with what kind of information was shared. The law lets them see extra details if needed. But there are some exceptions: they don't need to be told about sharing with another trusted company that asks for help investigating a problem.",
+    "questions": [
+      "What do I get when I ask my data provider to show me the summary of my personal data?",
+      "Do you share my information with other companies, and if so, who is it shared with and what kind of info is shared?",
+      "How can I find out more about how my data is used or where it's been shared?",
+      "What happens if another company asks for my data to help solve a problem? Do I need to know that too?",
+      "Do you have rules on when I don't get to see certain information, like who else has my info and what they've done with it?",
+      "How can I ask to see the list of other companies that have shared my personal data with your company?",
+      "Is there anything in particular you're not allowed to share about me without asking first?",
+      "Do I need to agree before you share my data with another trusted company, or does this happen automatically?"
+    ]
+  },
+  "s-12": {
+    "plain_english": "Customers can ask to fix, add to, and remove their information if they previously gave permission for it. Companies must change incorrect info, fill out missing details, and update the data when asked by customers. Customers need to tell companies how to contact them so they can erase their personal data. If a company needs to keep some of your data for work reasons or following laws, you won't be deleted.",
+    "questions": [
+      "Can I ask my company to change something in my profile?",
+      "How do I make sure my information is up-to-date with my company?",
+      "If I want my personal info removed, how should I contact the company?",
+      "What happens if a company says they need to keep some of my data for work reasons?",
+      "Can companies correct or update my information without asking me first?",
+      "How do I know when it's okay for a company to keep my data after you've asked them to delete it?",
+      "Is there anything else I should be aware of about changing my personal info with the company?",
+      "If I want my data removed, can I just ask and they have to comply?"
+    ]
+  },
+  "s-13": {
+    "plain_english": "Customers can get help fixing problems with their personal data from companies that handle it, and they have to try these steps first before talking to a special group called the Board.",
+    "questions": [
+      "How do I know if my company has a way to fix issues with my personal information?",
+      "What happens if I want to talk to someone about problems with how my data is used or shared by my company?",
+      "Is there a time limit for getting help from the company when something goes wrong with my personal data?",
+      "Can I use this section of the law to ask for changes in how my data is handled, like deleting it if needed?",
+      "If I don't get satisfaction from talking to my company about my data issues, where can I go next?",
+      "How long does a company have to respond to my complaint about their handling of my personal information?",
+      "Can I ask for help fixing problems with my data even after the company says they won't fix it anymore?",
+      "What happens if I don't follow this section and try all available options before going to the Board?"
+    ]
+  },
+  "s-14": {
+    "plain_english": "The main idea is that if a customer dies or can't make decisions, they can choose someone else to handle their personal information according to new laws and guidelines. This person would act as the customer's representative.",
+    "questions": [
+      "Who gets to decide who will manage my data after I die?",
+      "What happens if I'm not able to take care of my own data anymore? Can someone help me with it?",
+      "How can I choose a trusted person to handle my data when I’m not around?",
+      "Can anyone be chosen as the guardian for my data, or is there a specific process?",
+      "If I want someone else to manage my data, do they need special training or qualifications?",
+      "What if I change my mind about who manages my data? Can I reverse it easily?",
+      "Is there anything I should know before choosing someone to handle my data?"
+    ]
+  },
+  "s-15": {
+    "plain_english": "A customer must follow all laws when using their rights in this act. They can't pretend to be someone else with their personal information. They also need to share honest details for official documents like IDs and addresses. Customers shouldn't make fake complaints or ask for things they don't deserve. And they should only give real proof when asking for changes or deletions of their data.",
+    "questions": [
+      "What laws do I have to follow while using my rights under this act?",
+      "How can I ensure I'm not impersonating someone else with my personal information?",
+      "What kinds of documents need honest information from me, and what happens if I don't provide it correctly?",
+      "Do I risk any penalties for making false complaints or grievances?",
+      "If I want to change something in my data, how should I make sure the changes are real?",
+      "How can I be sure that all the information I share is correct and not fake?",
+      "What do I need to do differently when asking to delete my personal data compared to correcting it?",
+      "Do I face penalties if I submit false or frivolous complaints, and what happens then?"
+    ]
+  },
+  "s-16": {
+    "plain_english": "The government can tell companies not to send customer information to certain countries if they say so. But other rules that are stricter than this one still apply.",
+    "questions": [
+      "What countries can the government restrict from receiving our customers' data?",
+      "How does this affect how we share customer information with other businesses outside India?",
+      "Do we need to follow extra steps if the government says not to send data to a specific country?",
+      "If another law requires us to keep customer data private, will that override what the government says about sharing it?",
+      "What happens if our company wants to continue sending data to a restricted country after the notification?",
+      "How do we know which countries are restricted from receiving our customers' information?",
+      "Can we ask for permission to send data to a restricted country even though the government said no?"
+    ]
+  },
+  "s-17": {
+    "plain_english": "This section lets certain types of personal data processing happen without needing to follow all the rules. It's like having special permission for some tasks.",
+    "questions": [
+      "Can we process customer information when it’s needed for a legal case?",
+      "Is there an exception if our court uses customer data to make decisions?",
+      "Are we allowed to use customer details in cases of crime or rule-breaking?",
+      "Does this apply if we're collecting customer info from people outside India?",
+      "Can we process customers' data as part of merging companies?",
+      "What about processing personal information for loan defaults? Is there a limit on how much we can do?",
+      "Is it okay to use customer details when the government says it's necessary for national security?",
+      "Does this mean we don't have to follow any rules if we're working with an instrumentality of the state?"
+    ]
+  },
+  "s-17-1": {
+    "plain_english": "This section allows certain types of processing of personal data to be exempt from other rules in the act, such as when it's needed to enforce a legal right or when used by courts or other bodies with official duties.",
+    "questions": [
+      "What situations allow for processing personal data without following all the rules?",
+      "Can we process personal data if it’s necessary for a court to do its job?",
+      "In what cases can we handle someone else's personal information outside India?",
+      "How does this affect our ability to look at financial details of people who owe us money?",
+      "When is it okay to share personal data within a company merger, and when isn't it?",
+      "Can we use personal info for checking if someone has defaulted on their loan payments?",
+      "What are the rules about sharing sensitive information like default status or financial institution name with others?",
+      "How do we make sure we're not breaking any other laws by using this exception?"
+    ]
+  },
+  "s-17-2": {
+    "plain_english": "This section means that certain government agencies can process personal data without following all the rules in some cases, like for national security or research purposes. ",
+    "questions": [
+      "Can my personal information be used by the government for important things?",
+      "Is it okay if they use my info for studying and keeping records?",
+      "Does this mean I won't get into trouble if my data is shared with them for these reasons?",
+      "What happens to my data when the government uses it for research or statistics? ",
+      "Can the government tell me about how they're using my personal information?",
+      "Is there a way to stop the government from using my personal data in these cases?",
+      "Does this mean I can't have my personal info deleted if the government is using it for something important?",
+      "What rules do the government need to follow when using my personal data for research or statistics?"
+    ]
+  },
+  "s-17-3": {
+    "plain_english": "The government can tell certain companies that handle personal data, like startups, that they don't have to follow some rules about how to manage that data properly. This includes special rules for protecting and deleting people's information.",
+    "questions": [
+      "Which startup companies are exempt from specific privacy rules?",
+      "What does it mean if a company is notified as a Data Fiduciary under Section 5?",
+      "Can all startups be considered eligible, or do they need to meet certain criteria?",
+      "Who decides which startups get the exemption from these rules?",
+      "Which startups are exempt from having to protect personal data properly?",
+      "What specific sections of section 8 and 10 apply to Data Fiduciaries who are notified as startups?",
+      "How can I find out if my startup is eligible for this exemption?",
+      "Does being a Data Fiduciary mean the company has to delete customer's data upon request?"
+    ]
+  },
+  "s-17-4": {
+    "plain_english": "When the government or its helpers process your data, they don't have to follow all the rules about how much you can ask for information or delete it if something goes wrong. They only need to follow some specific parts of other laws.",
+    "questions": [
+      "Instrumentality of the State — what does that mean? Can you give me an example?",
+      "When processing data, do I still have a chance to get my personal info back from them if they mess up?",
+      "Do these rules change when they're using your data for something like deciding who gets help with their taxes?",
+      "What happens if they use your data in ways other than making decisions about you?",
+      "Can the government just ignore some parts of other laws when they process my data?",
+      "How do I know which part of another law to look at when they're processing my data?",
+      "Do these rules apply even if something goes wrong with their system and data leaks out?",
+      "What does it mean for them not to include making decisions that affect me in the 'not applying' parts?"
+    ]
+  },
+  "s-17-5": {
+    "plain_english": "The government can decide not to use some parts of the act for certain data managers after five years, by telling everyone with a special notice.",
+    "questions": [
+      "In what situations might the government choose not to apply part of this law to specific data managers?",
+      "How long does the government have to make a decision about which parts don't apply to any data managers?",
+      "What happens if the government doesn't give a reason for choosing not to apply certain parts of the act?",
+      "Do we need to worry if some parts of the law won't be used by all data managers, or just some of them?",
+      "Can the government change its mind and make those parts apply again later?",
+      "How can I find out which parts of the law are being exempted for specific data managers?",
+      "What happens if a part of the act is exempted from use for a long time? Will it ever be used again?",
+      "Do we need to follow any special rules when some parts aren't applied to certain data managers?"
+    ]
+  },
+  "s-18": {
+    "plain_english": "The Data Protection Board of India will start working from a date decided by the government. It's like setting up a special team to protect your personal information. This team can own things, make promises, and even take legal actions in its name. The main office for this team will be at a place chosen by the government.",
+    "questions": [
+      "Where will the Data Protection Board of India have its headquarters?",
+      "When exactly will the Data Protection Board start working?",
+      "What can the Data Protection Board do with property and money?",
+      "How does the Data Protection Board get permission to make promises or take legal actions?",
+      "Will there be any specific place where I can go if I want my personal data removed?",
+      "Can the government change the location of the Data Protection Board's headquarters at any time?",
+      "What kind of things can the Data Protection Board do with its power to contract and sue under this Act?"
+    ]
+  },
+  "s-19": {
+    "plain_english": "The Data Protection Board has a leader (Chairperson) and some members who are picked by the government. They need to have good knowledge about data protection and experience in areas like technology, laws, or consumer issues. At least one member should be really good at understanding legal stuff.",
+    "questions": [
+      "What qualifications do I need to become a Board Member for data protection?",
+      "How many people will be on the Data Protection Board overall?",
+      "Who decides who gets picked as Chairperson and other members of the board?",
+      "Do we have to be experts in technology or law to join the board, or are there other fields that count too?",
+      "What kind of knowledge do they need about data governance and administration?",
+      "How many people will be on the board based on what the government says?",
+      "Is it possible for someone who isn't a lawyer but has good tech skills to become part of this board?",
+      "Do we have to agree with the government's opinion that certain fields are useful for the board, or can we disagree?"
+    ]
+  },
+  "s-20": {
+    "plain_english": "The act sets out how much money the board members get paid and when they can stay on the job, with rules that don't change once they're hired or appointed.",
+    "questions": [
+      "How much do the board members earn each year?",
+      "Can board members continue working for more than two years if they want to?",
+      "What happens after their term ends? Can they be re-appointed?",
+      "Are there any changes to how much they get paid or when they can stay on during their term?",
+      "How long do the board members serve before needing a new appointment?",
+      "Can the government change the terms of service for existing board members once they've been appointed?",
+      "Is it possible for someone who has already served as a board member to be re-appointed after two years?",
+      "What happens if a board member wants to leave their position early? Can they do so without losing benefits?"
+    ]
+  },
+  "s-21": {
+    "plain_english": "The board can't have people who are insolvent, convicted of a serious offense, mentally or physically unable to work, financially conflicted, or abused their position. They also need to hear from them before removing someone from the board.",
+    "questions": [
+      "Can someone who is declared insolvent be appointed as Chairperson or Member?",
+      "What happens if someone on the board has been convicted of a serious offense? Can they stay?",
+      "If a board member becomes mentally or physically incapable, what should happen to their position?",
+      "Is there any limit to how much money or other benefits a board member can have that might affect their work?",
+      "Can the government remove someone from the board without giving them a chance to explain themselves?",
+      "What if a board member abuses their power? Can they stay in office then?",
+      "If a board member is financially conflicted, what does this mean for their job?",
+      "How can we ensure that people who are morally corrupt don't get on the board?"
+    ]
+  },
+  "s-22": {
+    "plain_english": "The board members can quit their positions by giving a written notice to the government. If they leave, another person is chosen to take over their role according to our rules. If someone who holds an important position on the board leaves for any reason, we need to fill that spot quickly with someone new. Also, if a board member quits or gets fired, they can't work for anyone else related to data for one year without telling us first.",
+    "questions": [
+      "What happens if a board member resigns? Who fills their position?",
+      "How do you know when a vacancy needs to be filled on the board?",
+      "If someone who used to be on the board quits or gets fired, what should they tell me about any new job opportunities?",
+      "Do we need to replace a board member immediately after they leave for some reason?",
+      "What if a board member accepts a job that could cause problems with data privacy? What do I need to know?",
+      "How long does someone have to wait before they can take another job related to data after leaving the board?"
+    ]
+  },
+  "s-23": {
+    "plain_english": "The Board must follow a set of rules for its meetings and can use digital methods. They also need to make sure their decisions are official by following certain procedures, like signing documents. The Board's actions won't be considered invalid if some people aren’t there or if someone isn’t properly chosen as Chairperson. If the main leader is unavailable, another important member will take over until they return.",
+    "questions": [
+      "Who can sign off on the Board's decisions and orders?",
+      "What happens if a meeting doesn't have all members present?",
+      "How do we know our data protection board has followed proper procedures?",
+      "If someone isn’t chosen correctly as Chairperson, does that mean their decisions are invalid?",
+      "Do meetings need to be in person or can they happen online too?",
+      "Who takes over for the Chairperson when they're not available?",
+      "What happens if there's a problem with how the Board conducts its business?",
+      "How do we make sure our data protection board is following all the rules?"
+    ]
+  },
+  "s-24": {
+    "plain_english": "The Digital Personal Data Protection Board can hire new staff with the government's okay, but they have to follow specific rules about what jobs get filled and how long people stay in those roles.",
+    "questions": [
+      "Who gets to decide who becomes a board officer?",
+      "Can the board hire anyone it wants without government approval?",
+      "What happens if someone doesn't like their job as an officer?",
+      "How much can the board pay new hires?",
+      "Does the board have to tell people when they get hired or fired?",
+      "Who decides how long officers stay in their positions?",
+      "Can the board change rules for officers after hiring them?",
+      "What happens if someone doesn't follow the rules about who gets a job?"
+    ]
+  },
+  "s-25": {
+    "plain_english": "The people who run the Data Protection Board are considered public servants if they're doing their job according to the law. This means they can't get in trouble for accidentally making mistakes while trying to protect personal data.",
+    "questions": [
+      "In case of a mistake, would someone from the Data Protection Board face legal issues?",
+      "How does this affect how we trust the people who run our data protection board?",
+      "If something goes wrong with protecting personal data, do I need to worry about the people in charge getting into trouble?",
+      "Do public servants like those at the Data Protection Board have special training or background checks before they start their jobs?",
+      "Can anyone from the Data Protection Board be held legally responsible for any mishaps involving personal data?",
+      "If a mistake happens with our data, who would be responsible - the board members or just the people who made the error?",
+      "How does being considered a public servant help protect us when things go wrong with how we handle personal information?",
+      "Would this change if someone from outside India was hired to work at the Data Protection Board?"
+    ]
+  },
+  "s-26": {
+    "plain_english": "The person in charge of the Data Protection Board can oversee everything the board does and give instructions on how things should be done. They can also allow other people within the board to look at important messages, complaints, or letters they receive. The person in charge can also let any member or a group of members handle certain tasks or decide which cases they want to work on.",
+    "questions": [
+      "Who is in charge of overseeing the Data Protection Board?",
+      "Can anyone else within the board review important communications like emails or letters?",
+      "Does the Chairperson have authority to assign specific jobs to different members of the board?",
+      "What happens if the Chairperson decides to delegate a task to one member or a group of them? How is that done?",
+      "How does the Chairperson decide which cases they want to handle themselves and which ones they will delegate to other members?",
+      "Can the Chairperson give permission for any member to look at complaints or communications addressed to the Board?",
+      "What if there's an urgent case, can the Chairperson assign it to someone immediately without following normal procedures?",
+      "Does the Chairperson have final say in how all administrative matters of the board are handled?"
+    ]
+  },
+  "s-27": {
+    "plain_english": "The Board can investigate and punish data breaches if they happen. They can also make rules for people who handle personal information to follow better. If someone is not following these rules, the Board can tell them to fix it or stop doing something. They can also change their own orders if needed.",
+    "questions": [
+      "Can the Board help if my data gets stolen?",
+      "What happens if I think a company isn't handling my personal info right?",
+      "If someone breaks a rule, what can the Board do about it?",
+      "How does the Board decide when to make new rules for people who handle data?",
+      "Can the Board change their own orders if they need to?",
+      "What should I do if I think the Board made an order that isn't fair?",
+      "If someone breaks a rule, can the Board tell them what to do differently or stop them from doing something?",
+      "How does the Board know when to make new rules for people who handle data?"
+    ]
+  },
+  "s-27-1": {
+    "plain_english": "The Board can take action if there's a problem with someone's personal information being shared or used wrongly. They can tell the person who had the mistake to fix it right away. If someone complains about how their data was handled, they can look into it and give them some money as punishment for not following rules. They also check on mistakes made by people who help others share their data.",
+    "questions": [
+      "What should I do if my personal information got shared wrong? Who can fix that?",
+      "If a company isn't following the rules about my data, how can I make sure they get in trouble?",
+      "How can I find out if someone is sharing my information without permission and what to do about it?",
+      "Do I need to worry if a person who helps others share my info makes a mistake? Who will check on that?",
+      "If my personal data was shared wrong by a company, how can I make sure they get in trouble?",
+      "How can I find out if someone is sharing my information without permission and what to do about it?",
+      "What happens if an intermediary (like a platform) isn't following the rules about my data? Who will look into that?",
+      "If there's a problem with how a company registered, who checks on that and what can be done?"
+    ]
+  },
+  "s-27-2": {
+    "plain_english": "The Board can give orders to anyone if they need to do their job better. They must first listen to what the person has to say and explain why they think these orders are needed. Then, they can issue orders that the person must follow.",
+    "questions": [
+      "In case I have a problem with something the Board did, how do I get it fixed?",
+      "How does the Board know if an order is necessary? What evidence do they need?",
+      "If the Board gives me an order, what happens next? Do I just have to follow it or can I ask for more time?",
+      "Can anyone else besides the Board give orders like this? Who decides who gets these powers?",
+      "What should I do if I disagree with an order from the Board? Can I appeal?",
+      "How does the Board decide which people they need to hear from before giving an order?",
+      "If the Board gives me a deadline, can I ask for more time to comply with it?",
+      "Can other organizations or individuals be required to follow these orders as well?"
+    ]
+  },
+  "s-27-3": {
+    "plain_english": "The Board can change, stop, remove, or end a decision made by them if someone affected asks for it or if the government tells them to do so. They can also add rules while doing this. ",
+    "questions": [
+      "Can the Board change their own decisions?",
+      "Who can ask the Board to modify a direction?",
+      "What happens if the Central Government refers an issue to the Board?",
+      "Can the Board make new rules when changing or stopping a decision?",
+      "How do I know if my request for modification was successful?",
+      "Does the Board have to explain why they changed, stopped, removed, or canceled something?",
+      "Who can ask the Board to modify a direction besides someone affected by it?",
+      "What happens after the Board modifies, suspends, withdraws, or cancels a decision?"
+    ]
+  },
+  "s-28": {
+    "plain_english": "The Board will handle complaints digitally. They can investigate anyone based on their findings, but they won't stop someone from running their business if it doesn’t affect daily operations. If needed, they can issue temporary orders to help with investigations.",
+    "questions": [
+      "Can the Board conduct inquiries into people's businesses using digital methods?",
+      "What powers do the Board and its officers have to gather evidence for investigations?",
+      "Are police officers required to assist the Board in their investigations if asked by the Board?",
+      "If someone is suspected of not following the Act, can the Board order them to stop something temporarily until they finish investigating?",
+      "Can the Board require people to produce documents or data during an investigation?",
+      "Does the Board have the same powers as a civil court when conducting inquiries under this Act?",
+      "What happens if there are insufficient grounds for proceeding with an inquiry? Can it be closed?",
+      "Can the Board inspect any premises, books, documents, registers, or other items to gather evidence?"
+    ]
+  },
+  "s-28-1": {
+    "plain_english": "The Board will work like an independent office that handles complaints digitally from start to finish, including receiving them, deciding on them, and making announcements about their decisions all through online processes.",
+    "questions": [
+      "In the digital office setup, how do we submit a complaint? Does it need to be in a specific format?",
+      "How can I ensure my complaint is heard quickly if it's submitted digitally? Are there any time limits?",
+      "Can you explain what 'techno-legal measures' mean and why they are important for our digital office system?",
+      "What happens if the Board decides not to hear my complaint? Is there anything I can do about that decision?",
+      "Do we need to provide personal information when filing a complaint, or is it enough just to describe the issue?",
+      "How will we know if our data has been compromised and what steps should we take next?",
+      "Can we request to see how our case was handled by the Board? Is there any way to review the digital files?"
+    ]
+  },
+  "s-28-2": {
+    "plain_english": "The board can act based on what they're told about a problem by sending them an intimation or complaint. They have to follow the rules set up for this Act when they do so.",
+    "questions": [
+      "In case I hear something is wrong with my data, how should I tell the board?",
+      "What actions can the board take if someone complains about their data?",
+      "How does following the rules help in dealing with data issues?",
+      "If the board gets a complaint, what steps will they likely take?",
+      "Do we need to do anything before telling the board about our data issue?",
+      "Can anyone complain about my data and have it looked into by the board?",
+      "What happens if I don't agree with how the board handles my data issue?",
+      "How can I find out more about the rules for handling data issues?"
+    ]
+  },
+  "s-28-3": {
+    "plain_english": "The board decides if they have enough reason to start looking into a situation, like when someone thinks personal data might be at risk or wrongfully used.",
+    "questions": [
+      "Can the board investigate if there's suspicion about how customer data is being handled?",
+      "What happens if the board doesn't find any grounds for an investigation? Is it closed then?",
+      "How does the board decide what kind of information they need to look into first?",
+      "If the board decides not to proceed, can customers still ask for their personal data to be deleted or corrected?",
+      "Who decides when the investigation is finished and if changes are needed in how customer data is managed?",
+      "Can the board share any findings from an investigation with other organizations that might help protect customer data?",
+      "What happens if the board finds evidence of misuse of customer data? Can they take action then?",
+      "Is there a time limit for the board to decide whether to proceed or not?"
+    ]
+  },
+  "s-28-4": {
+    "plain_english": "If the Board thinks they don't have enough reason to continue investigating or making decisions about something, they can stop and write down why they decided to end the process. They're like a judge who decides if there's not enough evidence to move forward anymore. ",
+    "questions": [
+      "Can the Board close an investigation if they don't have enough reasons?",
+      "What should the Board do if they decide to stop investigating and why?",
+      "Is it possible for the Board to continue even if they find out later there were more grounds?",
+      "How does the Board record their decision to end a case?",
+      "Can anyone ask the Board to reopen an investigation after they've decided not to proceed?",
+      "What happens if the Board decides to close an investigation without writing down why?",
+      "Is it important for the Board to explain why they're stopping the process, or can they just stop and be done with it?",
+      "Does closing an investigation mean that all findings or decisions made during the process are final?"
+    ]
+  },
+  "s-28-5": {
+    "plain_english": "If the Board thinks there's enough reason to look into someone's business practices, they can investigate if that person is following our data protection rules. They have to write down why they're doing it.",
+    "questions": [
+      "Investigating a company: Can the Board check how a firm handles customer information? Why would they do this?",
+      "What happens if the investigation finds non-compliance? Do we need to change anything in our practices?",
+      "If someone is investigated, can customers ask for their data to be deleted or changed? How does that work?",
+      "How long can an investigation last? Is there a limit on how many questions the Board can ask?",
+      "Can the Board share what they find out with other government agencies if it's related to data protection issues?",
+      "What happens if someone is found not to have followed our rules properly? Do we need to fix things or face penalties?",
+      "If we're investigated, do we get a chance to explain ourselves before any decisions are made?"
+    ]
+  },
+  "s-28-6": {
+    "plain_english": "The board must investigate any issues fairly, like how you would hear both sides before making a decision. They also need to explain why they made certain choices throughout this investigation.",
+    "questions": [
+      "Inquiry process: How does the Board ensure fairness during their investigations?",
+      "What are the reasons for actions that the Board needs to document?",
+      "How can we trust the decisions made by the Board if they don't have to explain them?",
+      "Do you think it's important for the Board to follow fair procedures when looking into issues?",
+      "Why is it crucial for the Board to record their reasoning for each action taken during an investigation?",
+      "Can anyone see or know why a decision was made by the Board, based on what you've explained?",
+      "How does following these principles help protect our data and privacy rights?",
+      "Do you think having reasons recorded makes people more comfortable with decisions made by the Board?"
+    ]
+  },
+  "s-28-7": {
+    "plain_english": "The Board can do all the things a civil court can do to help them follow this Act. They can ask anyone for information, make copies of important documents, look at records, and do anything else that is allowed by rules made for this purpose.",
+    "questions": [
+      "Can the Board order someone to give us their data?",
+      "What if we need a document they have? Can the Board help get it from them or find it?",
+      "If we want to check records, can the Board do that for us?",
+      "Are there any specific rules about what kind of documents we can ask for?",
+      "Can the Board make someone tell their story under oath if needed?",
+      "What happens if a person doesn't cooperate with the Board's requests? Can they be forced to?",
+      "If we need to check records, do we have to show proof that it's related to this Act?",
+      "Are there any limits on what kind of documents or information the Board can inspect?"
+    ]
+  },
+  "s-28-8": {
+    "plain_english": "The board can't stop you from using your own place or take away things that could make it hard for you to do your work, as long as it doesn't break rules about protecting personal data.",
+    "questions": [
+      "Can the board enter my office if I need to use it for work?",
+      "What happens if they want to check something in our equipment room? Can we stop them from taking things?",
+      "Is there a risk that they might take important items like computers or documents without permission?",
+      "Do I have any say in what the board does with my personal data, even if it's for work purposes?",
+      "Can they enter my home to check on something related to our company’s data?",
+      "What do we do if they try to take things from our office that aren't part of our equipment but are important to us?",
+      "Is there a specific rule about not taking personal items like phones or laptops when checking equipment?",
+      "Can I ask the board to leave my workspace if it's causing me problems?"
+    ]
+  },
+  "s-28-9": {
+    "plain_english": "The Board can ask police officers or government officials to help them, and they must follow their requests.",
+    "questions": [
+      "In case I need help from a police officer for this board's work, how do I request it?",
+      "What happens if the board asks a police officer to check on something related to personal data? Do I have to agree?",
+      "How can the Board get assistance from other government officials when dealing with personal data issues?",
+      "Do we need permission from the board before asking a police officer for help?",
+      "Can any police officer be asked by the Board to assist, or are there specific types of officers who can do it?",
+      "If the Board asks someone to check on personal data, what should I expect them to find out?",
+      "How does this process work if the Board needs an investigation into a potential leak in our system?",
+      "Do we need to give any special instructions when asking for police help with personal data issues?"
+    ]
+  },
+  "s-28-10": {
+    "plain_english": "The board can make temporary decisions during their investigation if they think it's needed and write down why. They must let the person involved know about this before making any changes.",
+    "questions": [
+      "Can the board change things without telling anyone?",
+      "What happens if someone disagrees with a decision made by the board?",
+      "Can the board tell me what I can do to stop them from changing something temporarily?",
+      "How long does it take for the board to make decisions during their investigation?",
+      "If the board makes an interim order, can they change it later without hearing me again?",
+      "What if someone wants to know why the board made a temporary decision? Can they ask?",
+      "Can I request that the board not make any changes until I have had time to think about it?",
+      "How do I find out what the board has decided during their investigation?"
+    ]
+  },
+  "s-28-11": {
+    "plain_english": "After hearing the person involved, if the Board decides that enough information has been gathered and no further investigation is needed, they can decide not to continue the case. Or they can follow the steps outlined in Section 33 instead.",
+    "questions": [
+      "In what situations would the Board choose to stop investigating after hearing the person concerned?",
+      "How does Section 33 differ from how the Board handles cases after hearing a party involved?",
+      "When might the Board decide not to continue with an investigation and close it, based on reasons recorded in writing?",
+      "What are the steps outlined in Section 33 that the Board could choose to follow instead of continuing the inquiry?",
+      "Is there any specific reason or criteria the Board must provide for closing an investigation after hearing a party involved?",
+      "How does the process differ if the Board decides not to continue with the case versus following section 33?",
+      "In what ways can Section 33 help expedite the decision-making process when dealing with cases after hearing parties involved?",
+      "Can you give examples of situations where the Board might choose to follow section 33 rather than continuing an investigation?"
+    ]
+  },
+  "s-28-12": {
+    "plain_english": "If the Board thinks your complaint isn't real or silly, they can tell you to stop bothering them or make you pay some money as a warning.",
+    "questions": [
+      "What happens if my complaint is considered false by the Board? Can I be charged for filing it?",
+      "How much might I have to pay if the Board says my complaint was frivolous?",
+      "Do we need to file complaints through an official channel, or can anyone do so without consequences?",
+      "Can the Board issue a warning instead of asking us to delete our data in response to a complaint?",
+      "If someone files multiple false complaints, what happens then?",
+      "What does it mean for a complaint to be considered 'frivolous' by the Board?",
+      "How might filing a complaint affect my relationship with the Board going forward?",
+      "Can we appeal if the Board decides not to take action on our complaint?"
+    ]
+  },
+  "s-29": {
+    "plain_english": "If someone disagrees with something the Board decides about their personal data, they can ask a special group called the Appellate Tribunal to look at it again. They have 60 days to file this appeal and need to pay some money too. If they miss the deadline, they might still be allowed if there's a good reason. The Appellate Tribunal will review what happened and make decisions based on their findings. They must tell everyone involved about any new orders they give. They try to finish all appeals within six months but can explain why if that isn't possible. ",
+    "questions": [
+      "Who decides when personal data is used incorrectly?",
+      "How long do I have to appeal a Board decision?",
+      "What happens if I miss the deadline for appealing?",
+      "Can the Appellate Tribunal change what the Board decided?",
+      "Where does the Appellate Tribunal send copies of its decisions?",
+      "Is there a limit on how long an appeal can take?",
+      "Who pays fees when appealing to the Appellate Tribunal?",
+      "How quickly should appeals be dealt with by the Appellate Tribunal?"
+    ]
+  },
+  "s-29-1": {
+    "plain_english": "If someone is unhappy with a decision made by the Board in your case, you can ask a special group called the Appellate Tribunal to look at it again.",
+    "questions": [
+      "In what situation would I need to appeal against an order from the Board?",
+      "How do I file an appeal if I want to challenge something the Board has decided?",
+      "What kind of decisions can be appealed by someone under this Act?",
+      "Do I have a right to ask for my data back after it was processed by the Board?",
+      "Is there a time limit for filing an appeal against the Board's decision?",
+      "How many people make up the Appellate Tribunal, and how are they chosen?",
+      "What happens if the Appellate Tribunal decides in favor of the Board again?",
+      "Do I need to pay any fees to file an appeal?"
+    ]
+  },
+  "s-29-2": {
+    "plain_english": "If someone disagrees with an order made about their data, they have to file a formal appeal within 60 days of getting the decision. They need to fill out the appeal in the way it's set up and pay any required fee.",
+    "questions": [
+      "How long do I have to file an appeal after receiving an order?",
+      "What form should my appeal be in?",
+      "Do I need to pay a fee for filing an appeal, and if so, how much?",
+      "Who decides what the forms look like for appeals?",
+      "Can I appeal more than once, or is there only one chance to file an appeal?",
+      "Is it possible to extend the 60-day deadline for filing an appeal?",
+      "What happens if I miss the 60-day deadline for filing an appeal?",
+      "Who can decide what constitutes a valid form and manner for filing an appeal?"
+    ]
+  },
+  "s-29-3": {
+    "plain_english": "If someone misses the deadline to appeal, they can still do so later as long as they have a good reason and the Appellate Tribunal agrees they should be allowed to appeal after the initial time limit has passed.",
+    "questions": [
+      "Can I appeal if I miss the initial appeal period?",
+      "What kind of reasons would make me eligible for an appeal after the deadline?",
+      "How does the Appellate Tribunal decide if I have a good reason to appeal later?",
+      "Is there any specific information or evidence needed to show they missed the deadline?",
+      "Does the Appellate Tribunal require proof that my case is important enough to justify late filing?",
+      "What happens if the Appellate Tribunal decides not to allow an appeal after the initial period?",
+      "Can I still appeal even if I didn't file a formal request within the initial time frame?",
+      "How can I make sure they consider all of my reasons for missing the deadline?"
+    ]
+  },
+  "s-29-4": {
+    "plain_english": "If someone appeals a decision from the original tribunal, they can ask for changes in that decision. The higher court will listen to both sides and then decide what to do—keep the original decision, change it slightly, or completely overturn it.",
+    "questions": [
+      "Can I appeal if I don't like how my case was handled?",
+      "What happens after I file an appeal? Do they hear me out first?",
+      "If I win my appeal, can the original court make changes to their decision?",
+      "Does the higher court have to agree with the original court's decision?",
+      "How long does it take for them to decide on my appeal?",
+      "Can I ask for a specific change in how I was treated during the appeal process?",
+      "If they don't hear me out, can I still file an appeal?",
+      "What if I disagree with their final decision? Can I do anything else?"
+    ]
+  },
+  "s-29-5": {
+    "plain_english": "The special court will give copies of their decisions to both the oversight board and the people who started the appeal, so everyone is informed about what happened.",
+    "questions": [
+      "In case of an appeal, where do I find out about the court's decision?",
+      "What information should I expect to receive from the Board after my appeal is heard?",
+      "How can I track if the Appellate Tribunal has sent copies of their decisions to all parties involved?",
+      "Do I need to check with the Board to confirm they received a copy of the order?",
+      "If something goes wrong, who do I contact first about the oversight board's involvement?",
+      "Who should I reach out to for more information on how to appeal an order made by the Appellate Tribunal?",
+      "How can I ensure that all parties involved receive copies of the court's decision?",
+      "Do I need to inform anyone if I want to know what happened in my case after it was heard?"
+    ]
+  },
+  "s-29-6": {
+    "plain_english": "If someone files an appeal in front of the Appellate Tribunal, they want their case handled quickly so they can get a final decision within about six months.",
+    "questions": [
+      "How long does the Appellate Tribunal have to make a final decision on my appeal?",
+      "Can I expect my appeal to be heard and decided in less than a year?",
+      "What happens if the Appellate Tribunal doesn't decide on my case within six months?",
+      "Is there anything I can do if I don't get a decision from the Appellate Tribunal after six months?",
+      "How does the Appellate Tribunal ensure it handles appeals quickly and efficiently?",
+      "Can I appeal again if I'm not satisfied with the first decision made by the Appellate Tribunal?",
+      "What should I expect in terms of communication from the Appellate Tribunal during my appeal process?"
+    ]
+  },
+  "s-29-7": {
+    "plain_english": "If an appeal can't be resolved by a judge in less than six months, the higher court has to explain why it took so long and what they're doing about it.",
+    "questions": [
+      "Why did my appeal take so long to resolve?",
+      "What happened during those six months that delayed our appeal?",
+      "Can I expect an update on when my appeal will be decided now that more time has passed?",
+      "Who can I contact if I still have questions about the delay in resolving my appeal?",
+      "Does this mean my case is permanently stuck or do they plan to resolve it soon?",
+      "What actions are being taken by the court to expedite my appeal process?",
+      "Can you provide any timeline for when we might expect a decision on our appeal now that more time has passed?",
+      "Is there anything I can do to help speed up the resolution of my appeal?"
+    ]
+  },
+  "s-29-8": {
+    "plain_english": "The special court can decide any complaints about a decision made by them based on how they usually handle other cases. They follow their own set of rules to hear these appeals.",
+    "questions": [
+      "In which cases does the Appellate Tribunal deal with an appeal?",
+      "How do they decide if someone has a right to appeal?",
+      "What are some examples of situations where this section might apply?",
+      "Do people have to pay anything when appealing to the Appellate Tribunal?",
+      "How long can it take for the Appellate Tribunal to make a decision after receiving an appeal?",
+      "Can anyone appeal decisions made by the Appellate Tribunal?",
+      "If someone disagrees with an appeal, what are their options?",
+      "What happens if the Appellate Tribunal decides against the party appealing?"
+    ]
+  },
+  "s-29-9": {
+    "plain_english": "If someone appeals a decision made by the Appellate Tribunal in this act, they will follow the rules set out for telecom cases in another law called the Telecom Regulatory Authority of India Act, 1997.",
+    "questions": [
+      "In an appeal case under this act, how do we handle complaints about data privacy issues?",
+      "What happens if someone wants to delete their information after an order is made by the Appellate Tribunal?",
+      "How can a customer challenge a decision that affects their personal data in court?",
+      "If there's a dispute over who owns the right to appeal under this act, what does it mean for telecom cases too?",
+      "Can customers get compensation if they lose an appeal related to their privacy rights?",
+      "What are the steps involved when someone wants to file an appeal and ensure their data is protected during that process?",
+      "How do we resolve conflicts between different laws regarding appeals in personal data matters?",
+      "If there's a conflict between this act and another law about how to handle appeals, which one takes precedence?"
+    ]
+  },
+  "s-29-10": {
+    "plain_english": "If someone wants to appeal something under this law, they can file their appeal digitally and everything related to it will be handled through a digital system, including receiving the appeal and making decisions about it.",
+    "questions": [
+      "Can I submit my appeal online for faster processing?",
+      "Will all communications regarding my appeal be done electronically?",
+      "How do I know if my appeal has been received by the Appellate Tribunal?",
+      "What happens if there is a hearing for my appeal? Is it conducted virtually or in person?",
+      "Can I request to have my case reviewed without having to go through an entire digital process?",
+      "If my appeal fails, can I still try to submit another one digitally?",
+      "How do I know when the decision on my appeal has been made and how will I be notified of it?",
+      "Is there a way to access or download any documents related to my case that are part of the digital process?"
+    ]
+  },
+  "s-30": {
+    "plain_english": "If an appellate tribunal makes a decision, they can enforce it like a judge in a regular court would. They have all the same powers to make orders. If the case is about something specific and local, they can send their order to a nearby civil court, which will then handle it as if it were its own decision.",
+    "questions": [
+      "Can an appellate tribunal's decision be enforced like a regular court decree?",
+      "What happens if an appellate tribunal needs help enforcing their orders in specific cases?",
+      "How can I get my data protected under this act?",
+      "Do all decisions made by the Appellate Tribunal have to go through local courts, or can they enforce them directly?",
+      "Can customers request that their personal information be deleted from company records?",
+      "What if a customer wants to appeal an appellate tribunal's decision? How is that done?",
+      "Is there a way for customers to get compensation for data breaches?",
+      "How does the act ensure that all decisions are made fairly and without bias?"
+    ]
+  },
+  "s-31": {
+    "plain_english": "If the Board thinks a problem can be solved by talking it out, they can tell everyone to try resolving their issue through mediation with someone they both choose or that is set up by the rules. ",
+    "questions": [
+      "If we have a disagreement and want to solve it without going to court, who decides if we should use mediation?",
+      "How do I find a mediator for our dispute?",
+      "Do we need special permission from anyone to use mediation?",
+      "What happens if we can't agree on a mediator?",
+      "Why does the law say this must be done by mutual agreement or under existing rules?",
+      "Can we choose any mediator we want, or are there specific requirements?",
+      "If we decide to mediate, who pays for it?",
+      "Do we have to go through mediation before going to court?"
+    ]
+  },
+  "s-32": {
+    "plain_english": "The board can accept a promise from anyone that they will follow the rules set by our law book. This promise can be about doing something or not doing something. The board can change this promise if everyone agrees to it. If someone breaks their promise, we can take action against them according to another part of the law.",
+    "questions": [
+      "Can I make a promise to follow your rules and get out of trouble?",
+      "If someone makes a promise to do something, can you change that promise later?",
+      "What happens if someone breaks their promise to follow our rules?",
+      "Can we still take action against someone who broke their promise even though they made a promise to us?",
+      "How do I know what promises I have to make and what actions I need to take?",
+      "If I break my promise, can you tell me why I did it wrong?",
+      "Does the board have to let me explain before taking action against someone who broke their promise?",
+      "Can we change our rules if someone makes a promise to follow them?"
+    ]
+  },
+  "s-33": {
+    "plain_english": "If someone breaks important rules in our data protection law, they might have to pay money as a punishment. The amount depends on how bad their mistake was, what kind of personal information got mixed up, and if they tried to fix it.",
+    "questions": [
+      "What is the maximum penalty for breaking this act's rules?",
+      "How do I know if my breach is significant enough to get a penalty?",
+      "Can you explain what 'repetitive nature' means in this context?",
+      "If someone realizes they've made a profit from a data breach, does that mean they'll pay more penalties?",
+      "What actions can be taken to reduce the amount of money they have to pay?",
+      "How do I know if my response to the penalty is effective and timely?",
+      "Is there any chance the penalty won't affect me financially?",
+      "Do you think someone who didn't try to fix their mistake will get a lighter penalty?"
+    ]
+  },
+  "s-34": {
+    "plain_english": "This section says any money collected as fines for breaking the rules in our act will go into a big pot called the Consolidated Fund of India.",
+    "questions": [
+      "Where does the money from penalties go?",
+      "Who collects these fines and where do they put the money?",
+      "Is there a specific account or fund where all penalty money goes to?",
+      "What is this 'Consolidated Fund of India' used for?",
+      "Can we see how much money has been collected in fines so far?",
+      "Where does the government keep track of these fine collections?",
+      "Does collecting fines help pay for public services, like schools or hospitals?",
+      "How do people know if they are being fined under this act?"
+    ]
+  },
+  "s-35": {
+    "plain_english": "This section says that if someone does something good-hearted under our data protection law, they won't get sued by others. It protects people who work for the government and make decisions based on what's right even if things go wrong.",
+    "questions": [
+      "Can we sue the Central Government for mistakes made in good faith?",
+      "Who can be protected from legal action under this section?",
+      "Does this mean I won't get sued by others if I do something good for my company based on new data rules?",
+      "What does 'good faith' mean when it comes to working with our data protection board?",
+      "Can we still sue someone who works for the government if they make a mistake?",
+      "Is there any situation where this section doesn't apply, like if I break the law deliberately?",
+      "Who decides what is considered 'done in good faith'? Is it just the people doing the work or others too?",
+      "Does this mean we can always trust that the government and its workers will make decisions based on our data protection rules?"
+    ]
+  },
+  "s-36": {
+    "plain_english": "The government can ask the board and anyone who handles data to give them whatever information they need for our law.",
+    "questions": [
+      "Can the government get all the details about how someone is using my personal info?",
+      "If I want, do I have to tell the government everything about what companies are doing with my data?",
+      "Does this mean the government can ask me questions about my own data privacy rights?",
+      "What kind of information does the government need from these other people who handle my data?",
+      "Can they make sure that all the companies using my info follow our laws properly?",
+      "If I give them too much sensitive personal info, will it be safe and not shared with others?",
+      "Is there a limit to how long the government can keep asking for this information?",
+      "Do I have any say in what kind of data they ask for from these other companies?"
+    ]
+  },
+  "s-37": {
+    "plain_english": "The government can tell service providers not to share certain types of information with customers if they've been found guilty of breaking rules multiple times. They can do this after giving the provider a chance to explain and record their decision in writing. The service providers must follow these instructions.",
+    "questions": [
+      "Can the government block access to my data by companies that offer goods or services?",
+      "What happens if I'm found guilty of breaking rules multiple times with my company?",
+      "How can I get a chance to explain why they shouldn't block my information from being shared?",
+      "Who decides whether it's necessary to block access to the information, and how do they make that decision?",
+      "Can anyone be blocked from accessing my data, or just companies offering goods or services?",
+      "What if I disagree with the government’s decision to block access? Can I appeal?",
+      "Does this apply only to computer resources like websites, or does it cover other types of information too?",
+      "Who decides what type of information should be blocked from being accessed by others?"
+    ]
+  },
+  "s-38": {
+    "plain_english": "This section says that when there are rules from other laws already in place, we add our own rules on top of them. If a new rule conflicts with an old one, we follow our new rules unless it causes problems.",
+    "questions": [
+      "What happens if the Digital Personal Data Protection Act and another law both say different things about personal data? Can you pick which one to use?",
+      "How do I know when my other laws are in conflict with this act's rules on personal data?",
+      "Can you explain what 'prevail' means here, like in a game of tag where we have to follow our own rules unless another player's rule stops us from playing?",
+      "Do we need to change any other laws if the Digital Personal Data Protection Act is added to them?",
+      "What does it mean when the new act says it will 'prevail' over old ones? Can you give an example?",
+      "How do I know which law is more important between this one and another, like deciding who gets to choose dessert first at a party?",
+      "Can someone else's rule override our Digital Personal Data Protection Act rules on personal data if they're older?"
+    ]
+  },
+  "s-39": {
+    "plain_english": "This section means that courts can't handle cases about what the Board (a group that makes rules) is allowed to do, and they can't stop the Board from doing its job by giving them an order to not do something.",
+    "questions": [
+      "Can a court decide if the Board did something wrong?",
+      "What happens if someone wants to stop the Board from taking action based on this Act?",
+      "Does this mean courts won't hear cases about things the Board can legally do under the Act?",
+      "If I disagree with what the Board did, where should I go instead of a court?",
+      "Can the Board make rules that courts have no power to change or stop?",
+      "Is it okay for the Board to take action even if someone thinks they shouldn't?",
+      "What does this mean for people who want to challenge actions by the Board in court?",
+      "Does this section affect how courts can handle cases involving personal data under the Act?"
+    ]
+  },
+  "s-40": {
+    "plain_english": "This law allows the government to create rules that help explain how companies should communicate with customers about their data and ensure they follow certain obligations. It also covers things like who needs to register, what kind of information can be shared for free, how to report a data leak, and how to get your personal info removed if you want it gone.",
+    "questions": [
+      "How does the Data Fiduciary need to inform customers about their rights under section 5?",
+      "What should the Consent Manager do according to section 6?",
+      "Can companies get special permissions for processing customer data, and what are they called?",
+      "Where can I find out how to contact a Data Protection Officer?",
+      "How long does my company have to respond if someone complains about their data being mishandled?",
+      "What kind of information do I need to provide to get my personal details removed from the system?",
+      "Can you tell me more about what types of companies are considered Significant Data Fiduciaries and how they're supposed to operate?",
+      "How can customers request information about their own data processing?"
+    ]
+  },
+  "s-40-1": {
+    "plain_english": "The government can create new rules to help follow the Digital Personal Data Protection Act as long as they don't go against what's in the act itself and after they're published for everyone to see.",
+    "questions": [
+      "In which areas will the Central Government make new rules?",
+      "How will the public be notified about these new rules?",
+      "What happens if a rule made by the government is found to be inconsistent with the act? ",
+      "Do we need to agree to these new rules before they take effect?",
+      "Why are the rules subject to publication before being implemented?",
+      "Can any individual or organization make their own rules based on this act?",
+      "How will I know if there have been changes to existing rules?",
+      "What can happen if a rule is not in line with what's stated in the Digital Personal Data Protection Act?"
+    ]
+  },
+  "s-40-2": {
+    "plain_english": "This provision allows rules to specify how a Data Fiduciary should inform a customer about their rights and obligations, including things like accountability measures for Consent Managers. It also covers what kinds of information must be provided in case of a data breach and when certain duties can be considered fulfilled.",
+    "questions": [
+      "How does the Data Fiduciary need to notify customers about their rights?",
+      "What are the requirements for informing customers about their obligations under this act?",
+      "Can you explain what kind of information must be provided in case of a data breach?",
+      "When can a duty or obligation be considered completed based on this provision?",
+      "Who is responsible for ensuring accountability and what does that entail?",
+      "What are the conditions for registering as a Consent Manager, according to this section?",
+      "How should personal data breaches be reported to the Board under this act?",
+      "Can you provide examples of subsidies or benefits that can be provided using personal data?"
+    ]
+  },
+  "s-41": {
+    "plain_english": "The rules and notifications made by the government under this act must be shared with both houses of parliament within 30 days. If they agree, they can change these rules or say they don't need to be followed at all. The changes will only apply after the agreed-upon modifications are made.",
+    "questions": [
+      "When should I expect to see new government rules and notifications in my inbox?",
+      "Can the parliament modify any of the rules that were issued by the government under this act?",
+      "What happens if both houses agree not to make or issue a rule or notification? Does it just disappear, or is there something else we need to do?",
+      "How can I find out what changes have been made to a specific rule or notification?",
+      "If I disagree with a new rule or notification issued by the government, how can I voice my concerns?",
+      "What happens if both houses agree on modifications but take more than 30 days to make them? Does it still apply?",
+      "Can we request that a particular rule or notification be reviewed before making any changes?",
+      "Is there a way for me to provide feedback on the government's rules and notifications?"
+    ]
+  },
+  "s-42": {
+    "plain_english": "The government can change some rules in a list called 'Schedule' by telling everyone about it, but they can't make penalties stricter than what was originally set.",
+    "questions": [
+      "Can the government add new penalties to Schedule?",
+      "How do we know when changes are made to Schedule?",
+      "What if someone wants to change an existing penalty in Schedule? Can that happen?",
+      "Does changing Schedule affect how quickly it takes effect?",
+      "Is there a limit on how much penalties can be increased?",
+      "Can the government change Schedule without telling anyone about it?",
+      "Who decides what changes are made to Schedule?",
+      "When does a new rule from Schedule take effect?"
+    ]
+  },
+  "s-43": {
+    "plain_english": "If there are any problems with how a part of the act works, the government can make new rules to fix them without breaking other parts of the law. These new rules must not go against what's already in the act and they need to be made within three years after the act starts working. The government has to show these new rules to both houses of parliament as soon as possible.",
+    "questions": [
+      "Can the government make new rules if there are problems with how the act works?",
+      "How long does the government have to make new rules about any issues they find?",
+      "Who do the government need to show their new rules to after making them?",
+      "What happens if a problem is found in the act that can't be fixed by making new rules?",
+      "Can the government change existing parts of the act with these new rules?",
+      "Is there anything else the government needs to do besides showing the new rules to parliament?",
+      "How does this section ensure that the government doesn't make too many new rules quickly?",
+      "What could happen if the government makes a rule after three years from when the act started?"
+    ]
+  },
+  "s-44": {
+    "plain_english": "This provision changes some parts of existing laws. It adds a new tribunal under the Digital Personal Data Protection Act that can hear cases related to telecom and airport regulations. It also removes a specific section from the Information Technology Act, and modifies how the Right to Information Act handles personal information.",
+    "questions": [
+      "What new tribunal will be added for telecom issues?",
+      "Which act's section 43A is being removed?",
+      "How does this affect how personal info can be shared under the RTI Act?",
+      "Can you explain what clause (j) has been changed to in the RTI Act?",
+      "Does this mean I have more options for appealing telecom issues now?",
+      "What specific act's section 81 is being modified, and why?",
+      "How does adding a new tribunal under the Digital Personal Data Protection Act affect my rights?",
+      "Can you clarify which part of the Information Technology Act has been changed?"
+    ]
+  },
+  "def-appellate-tribunal": {
+    "plain_english": "This section tells us about a special group called the Appellate Tribunal. It's like a higher court that handles telecom disputes based on rules made by another law.",
+    "questions": [
+      "In which act is the Appellate Tribunal established?",
+      "What kind of disputes does the Appellate Tribunal handle?",
+      "How many years ago was this special tribunal set up?",
+      "Who makes the rules for the Appellate Tribunal?",
+      "Do people have to follow the decisions made by the Appellate Tribunal?",
+      "Why do we need a separate group like the Appellate Tribunal?",
+      "If there's an error in their decision, can someone appeal to them again?",
+      "How many members are typically on this tribunal?"
+    ]
+  },
+  "def-automated": {
+    "plain_english": "This section says that 'automated' refers to anything that can work by itself on a computer based on what it's told, like a program that sorts emails without you having to do it manually.",
+    "questions": [
+      "What does it mean when something is described as automated?",
+      "Can I use the term 'automated' for any software tool we use in our business?",
+      "Is there anything specific about how an automated process should operate according to this section?",
+      "How can a digital process be considered automated if it requires human input at some point?",
+      "What kind of instructions does an automated system need to follow?",
+      "Can you give me an example of something that would not be considered automated based on this definition?",
+      "Is there any difference between manual and automated processes in terms of how they handle data?",
+      "Does the term 'automated' apply only to certain types of software or does it cover all digital tools?"
+    ]
+  },
+  "def-board": {
+    "plain_english": "The 'Board' is a group set up by the government to handle data protection stuff. ",
+    "questions": [
+      "Who sets up the Board?",
+      "What does the Board do with regards to data protection? What kind of problems can it solve?",
+      "How many people are on the Board?",
+      "Does the Board have any special powers or responsibilities?",
+      "Can anyone appeal a decision made by the Board?",
+      "Is there a limit to how long someone stays on the Board?",
+      "What happens if the Board doesn't do its job properly?"
+    ]
+  },
+  "def-certain-legitimate-uses": {
+    "plain_english": "This chapter explains that certain legitimate uses refer to what's listed in Section 7. It's about how organizations can use customer data legally.",
+    "questions": [
+      "In Section 7, what are some examples of legal ways we can use customer data?",
+      "What types of customer information is allowed for 'certain legitimate uses' according to the act?",
+      "How do these uses help protect customers while still using their data?",
+      "Do you know which section in the act specifies what's considered a 'legitimate use'?",
+      "Who decides what qualifies as a 'legitimate use' under this law?",
+      "What are some examples of customer information that might be used legally according to the act?",
+      "How does this affect how companies can handle and share customer data?",
+      "Do you know which part of the act outlines exceptions or limitations for these uses?"
+    ]
+  },
+  "def-chairperson": {
+    "plain_english": "This section just tells us who the 'Chairperson' is - it's the person in charge of the board. It’s like having a captain for your company’s decision-making team.",
+    "questions": [
+      "Includes, what does 'Chairperson' refer to?",
+      "What role does this person play within our organization?",
+      "How do we choose or appoint the Chairperson of our Board?",
+      "How important is it that everyone knows who the Chairperson is?",
+      "If there's a change in leadership, how does this affect the 'Chairperson' position?",
+      "Who can be considered as the 'Chairperson'? Is it just one person?",
+      "What happens if someone disagrees with what the 'Chairperson' decides?",
+      "Do we need to have a specific title for our leader of the board?"
+    ]
+  },
+  "def-child": {
+    "plain_english": "This section says a 'child' is anyone under 18 years old. It helps us understand who we need to treat differently when it comes to personal information, like keeping their data safe and asking for permission before using it.",
+    "questions": [
+      "In what age group does the Digital Personal Data Protection Act consider someone as a child?",
+      "How do I know if the act considers me a child based on my age?",
+      "What kind of personal information might be considered about children under 18 years old?",
+      "Do we need to get permission from parents or guardians when sharing data about children with third parties?",
+      "Who is responsible for ensuring that children's personal information is handled properly according to this law?",
+      "How does the act protect the privacy of children who use digital services and apps?",
+      "What happens if a child’s personal information gets shared without their knowledge or consent?",
+      "Do we need to have special safeguards when collecting data from children, even if they are older than 18?"
+    ]
+  },
+  "def-consent-manager": {
+    "plain_english": "A Consent Manager is someone you can talk to about your data. They help you decide what information you want shared and how it should be used, and they keep track of all the choices you make.",
+    "questions": [
+      "What does a Consent Manager do for me?",
+      "How can I change my mind about sharing my personal info with companies now or in the future?",
+      "Can I talk to more than one person if I have questions about my data?",
+      "Do I need to tell someone new if I want to use different settings for different apps?",
+      "I trust this person, but how do I know they won't misuse my information?",
+      "How can I find out what choices I've made and where I can change them?",
+      "Can I ask a Consent Manager to help me delete all my personal data from one place or company at once?",
+      "Do I have to use the same Consent Manager for every app or website that uses my info?"
+    ]
+  },
+  "def-data": {
+    "plain_english": "The term 'data' refers to any kind of information that can be communicated or processed using machines or humans. It includes numbers, text, images, and other forms of data.",
+    "questions": [
+      "In what form is data considered valid for communication?",
+      "How do we classify different types of data like personal, financial, or medical information?",
+      "What are the methods used to interpret or process this type of data?",
+      "Do machines need special training to understand all kinds of data?",
+      "Why might some forms of data be more valuable than others?",
+      "Can non-technical people still use and understand data once it's processed?",
+      "How do we ensure that all types of data can be communicated effectively?",
+      "What are the different ways humans or machines can process this kind of information?"
+    ]
+  },
+  "def-data-fiduciary": {
+    "plain_english": "A Data Fiduciary is someone who decides how your personal information will be used and collected, either by themselves or with others. ",
+    "questions": [
+      "Who decides what to do with my personal info?",
+      "Can I choose who handles my data?",
+      "What happens if a Data Fiduciary mishandles my data? How can I fix it?",
+      "How does the law know which person is the Data Fiduciary for me?",
+      "If someone else's company uses my data, do they count as the Data Fiduciary?",
+      "Can I ask to see what personal info a Data Fiduciary has about me?",
+      "What if I don't want my data used anymore? Can I make them delete it?",
+      "How can I find out who is considered a Data Fiduciary for me?"
+    ]
+  },
+  "def-data-principal": {
+    "plain_english": "This section explains who a 'customer' is in our new law. It's about the person whose information we're talking about, like your name or address. The term covers anyone you can identify.",
+    "questions": [
+      "Who exactly are customers under this act?",
+      "Can my business partner be considered a customer for data protection purposes?",
+      "What if I don't know who to call when there's a mistake with my personal information?",
+      "How do I find out what type of personal data the company has on me?",
+      "If someone else is using my name, can they still be considered a customer under this act?",
+      "Can customers ask for their information to be deleted from our records?",
+      "Who decides if there's been a mistake with my personal information and what should I do about it?",
+      "Do I need to give permission before you use my data?"
+    ]
+  },
+  "def-data-processor": {
+    "plain_english": "A Data Processor is someone who helps a company handle customer information, like managing emails or payments. ",
+    "questions": [
+      "Who handles my info when I use services?",
+      "Can I ask to see how my data is used by service providers?",
+      "What happens if my personal data gets lost or stolen? ",
+      "How can I tell if a company uses me as their Data Processor?",
+      "Do companies need special permission to use customer information?",
+      "Is it okay for service providers to share my info with others without telling me?",
+      "Can I ask a company to delete all of my information they have on me?",
+      "What should I do if I think my data was mishandled by a service provider?"
+    ]
+  },
+  "def-data-protection-officer": {
+    "plain_english": "The Data Protection Officer is a person chosen by the Significant Data Fiduciary to oversee data protection matters. ",
+    "questions": [
+      "Who appoints the Data Protection Officer?",
+      "What does the Data Protection Officer do?",
+      "Is anyone else allowed to be in charge of data protection besides the appointed individual?",
+      "Can the appointment of the Data Protection Officer change over time?",
+      "How is the Data Protection Officer supposed to communicate with other parties about data protection issues?",
+      "Does the Data Protection Officer have any special training or qualifications?",
+      "What happens if a significant data breach occurs and who does the Data Protection Officer need to notify?",
+      "Is there anything else I should know about the role of the Data Protection Officer?"
+    ]
+  },
+  "def-digital-office": {
+    "plain_english": "This section says a 'digital office' is any place where work happens through computers and internet. So if you get a notice, make a complaint, ask for help, or have a problem that goes to someone's desk via email or website instead of in person, it’s happening at a digital office.",
+    "questions": [
+      "In which scenarios would I use a digital office?",
+      "How does using a digital office affect how my case gets handled?",
+      "What are some examples of things done through a digital office?",
+      "Do digital offices handle all types of cases equally well or just specific ones?",
+      "Why might someone choose to use a digital office instead of going in person?",
+      "Can you give me an example of what happens when something goes wrong at a digital office?"
+    ]
+  },
+  "def-digital-personal-data": {
+    "plain_english": "This section says that 'digital personal data' refers to information about people that is stored in a digital format, like on computers or the internet.",
+    "questions": [
+      "What counts as digital personal data?",
+      "Can all types of data be considered digital personal data?",
+      "Is there any difference between digital and non-digital personal data now?",
+      "How can I make sure my information is not considered digital personal data?",
+      "Who decides what qualifies as digital personal data?",
+      "What happens if someone tries to classify something that isn't really personal data as digital personal data?",
+      "Can digital personal data be in any format, or just specific ones?",
+      "Is there a limit to how much of my information can be considered digital personal data?"
+    ]
+  },
+  "def-gain": {
+    "plain_english": "This section explains what 'gain' means in our new data protection act. It's something a company does when they benefit from having someone’s personal information, like selling it to another business.",
+    "questions": [
+      "In the context of our new law, how do companies get classified as having 'gained' from using customer data?",
+      "How might companies be penalized if they misuse what they consider to be their 'gain' from customer data?",
+      "What does a company need to ensure when they decide to sell customer information for profit under this act?",
+      "How can we protect our personal data so that companies don't see it as something they can gain from?",
+      "Can you explain how the definition of 'gain' affects how companies are held accountable for using customer data?",
+      "If a company decides not to use customer data anymore, does that mean they no longer have 'gained' anything from that data?",
+      "How might understanding what constitutes 'gain' help customers better manage their privacy and security online?",
+      "What steps can businesses take to ensure they're correctly classifying when they've gained from using customer information?"
+    ]
+  },
+  "def-loss": {
+    "plain_english": "This section explains what we mean by 'loss.' It includes any situation where something valuable, like information about a customer (like their name and address), is not in the right place or isn't protected properly.",
+    "questions": [
+      "What happens if my personal data gets lost?",
+      "How do I know if my data has been lost?",
+      "Who decides what counts as loss of my personal information?",
+      "Can you help me recover my lost data?",
+      "If my data is lost, how can it affect my account or service?",
+      "What should I do if I think my data might have been lost?",
+      "How long does the company have to fix a loss of my data?",
+      "Is there anything else I need to know about when my data is considered 'lost'?"
+    ]
+  },
+  "def-member": {
+    "plain_english": "This section tells us that 'Member' refers to anyone on the board, including the person in charge. ",
+    "questions": [
+      "Who counts as a member on the board?",
+      "Does the chair count as a member too?",
+      "What does it mean for someone to be part of the board?",
+      "Who is considered a member if they're not the chair? ",
+      "Can anyone join the board and be considered a member?",
+      "Is being a member different from just sitting on the board?",
+      "How many members are typically needed for a board?",
+      "Does membership change based on who's in charge?"
+    ]
+  },
+  "def-notification": {
+    "plain_english": "This section says 'notification' is when important information is shared with everyone through official papers. It also explains how we should understand words like 'notify' and 'notified'.",
+    "questions": [
+      "What does it mean to notify someone about a data issue?",
+      "How do I know if my business needs to notify the public or just the affected customers?",
+      "Where can I find out what constitutes a notification in our company policies?",
+      "Is there a specific form for notifying customers when something goes wrong with their personal information?",
+      "Can we choose who receives notifications about data issues, like only certain departments or all employees?",
+      "What happens if we don't notify anyone after having a data issue? Are we still responsible?",
+      "How do we make sure our notification is clear and understandable for everyone who reads it?",
+      "Is there any limit to how much time we have to notify someone about a data issue?"
+    ]
+  },
+  "def-person": {
+    "plain_english": "This section says that when we talk about people, it means everyone including you and me as well as any other individual.",
+    "questions": [
+      "What does 'person' include in this act?",
+      "How would you describe who a 'person' is according to the Digital Personal Data Protection Act 2023?",
+      "Do I count as a person under this law?",
+      "If someone else is mentioned in our data protection rules, are they also considered a person?",
+      "Who exactly falls under the category of 'person' for legal purposes?",
+      "What does it mean when we say 'includes' in relation to people?",
+      "How would you explain who can be classified as a 'person' based on this act?",
+      "Do I have rights or responsibilities because I am considered a 'person' under this law?"
+    ]
+  },
+  "def-personal-data": {
+    "plain_english": "This section says 'personal data' includes anything that can identify a person, like their name or email address. It's information that lets others know who someone is.",
+    "questions": [
+      "Includes identifying information? How do I make sure my personal data isn't included?",
+      "What counts as identifiable by the data itself?",
+      "Do we need to protect all types of personal data equally?",
+      "How does this affect how we handle sensitive personal data like health records?",
+      "Can anonymous data be considered personal data under this definition?",
+      "Who decides what is and isn’t personal data in our company?",
+      "How do we ensure that all our employees understand the scope of personal data?",
+      "Do we need to keep a list of everything classified as personal data?"
+    ]
+  },
+  "def-personal-data-breach": {
+    "plain_english": "This law says a 'personal data breach' happens when someone mishandles your private information in ways that could make it unsafe or cause problems. It can be from people who shouldn't have seen it or if you lose control over where the info is stored.",
+    "questions": [
+      "What does this mean for my company's security measures?",
+      "How do I know if something counts as a personal data breach?",
+      "Do we need to report any breaches that happen to customers?",
+      "Can our IT team handle these breaches without outside help?",
+      "What happens if someone tries to hack into our customer information?",
+      "How can we prevent more of these from happening in the future?",
+      "If there's a breach, what do I tell my customers about it?",
+      "Do we need to notify everyone who might have been affected by a breach?"
+    ]
+  },
+  "def-prescribed": {
+    "plain_english": "This section says that when something isn't already clearly defined in the act, it can be set by rules made later. So if there's a term like 'prescribed,' we look to see what rules say about it.",
+    "questions": [
+      "In this law, where do I find out what things are considered 'prescribed'?",
+      "How does my data get protected when something isn't clearly defined in the act?",
+      "What kind of rules can make something 'prescribed' under this Digital Personal Data Protection Act?",
+      "If a rule says something is 'prescribed,' does that mean it's final and cannot be changed anymore?",
+      "Who makes these rules to define what things are 'prescribed'? Is it just anyone, or do they have special qualifications?",
+      "How important is it for the rules defining 'prescribed' to be clear and understandable?",
+      "If a rule says something is 'prescribed,' can that thing change over time without new rules being made?",
+      "Can I ask for changes in what's considered 'prescribed' if my situation has changed?"
+    ]
+  },
+  "def-proceeding": {
+    "plain_english": "This section says a 'proceeding' is anything the Data Protection Board does, like making decisions or taking actions, based on what's in our act.",
+    "questions": [
+      "Involving the DPD, what kind of actions can the board take?",
+      "How do I know if my business has taken part in any 'proceedings' with the DPD?",
+      "What kinds of things might a proceeding involve? Can you give me an example?",
+      "Do we have to follow up on every proceeding made by the DPD?",
+      "If something goes wrong, how does it become a 'proceeding'? Is there a specific trigger for this?",
+      "How can I find out what proceedings are ongoing or completed in my business's case with the DPD?",
+      "Can businesses appeal against a decision made during a 'proceeding'?"
+    ]
+  },
+  "def-processing": {
+    "plain_english": "This section says 'processing' means any digital data handling done through computers, including collecting, organizing, storing, and sharing personal information. ",
+    "questions": [
+      "What does processing include? ",
+      "Can you give me an example of what is considered processing?",
+      "How can I stop my data from being processed?",
+      "Is there a limit to how long companies can keep my data before it needs to be deleted?",
+      "Who decides when and how personal data should be used or shared?",
+      "What happens if someone tries to access my private information without permission?",
+      "Can I ask for all of my digital data to be erased from the company's systems?",
+      "How does this affect the privacy settings on apps and websites?"
+    ]
+  },
+  "def-she": {
+    "plain_english": "This section means that when we use 'she' or any other pronoun, it can be used for both men and women. It doesn't matter if you are using it for a man or a woman, the meaning stays the same.",
+    "questions": [
+      "Can I use she to refer to anyone in our company?",
+      "Does this mean we have to change all our documents to use she instead of he when talking about people?",
+      "If someone is referred to as 'she' but they are actually a man, does that affect how we treat them?",
+      "What happens if I accidentally use the wrong pronoun for someone? Do I need to fix it?",
+      "Can we still call someone by their name instead of using she when talking about them?",
+      "Does this mean we can't use 'he' anymore in our company documents?",
+      "Is there a specific rule on how many times we should use the word 'she' in our documents?",
+      "What if I want to change from using he/she to just using they? Can I do that?"
+    ]
+  },
+  "def-significant-data-fiduciary": {
+    "plain_english": "This section tells us who a 'Significant Data Fiduciary' is. It's anyone who handles lots of personal data, like big companies or government agencies, and they get to decide based on what the government says.",
+    "questions": [
+      "Includes which types of organizations will be considered significant data fiduciaries?",
+      "How does the Central Government decide which organizations are significant data fiduciaries?",
+      "What happens if an organization is not notified but handles a lot of personal data?",
+      "Do we know how many people can be part of a class of significant data fiduciaries at one time?",
+      "Who decides what counts as 'handling lots of personal data' for the purpose of being a significant data fiduciary?",
+      "How does this affect who needs to follow the rules about protecting personal data?",
+      "What are examples of situations where an organization might not be notified but still considered a significant data fiduciary?",
+      "Do we know how often the Central Government will review and update its list of significant data fiduciaries?"
+    ]
+  },
+  "def-specified-purpose": {
+    "plain_english": "This section says a 'specified purpose' is whatever the company tells you about how they'll use your information, as long as it's clear in their notice. ",
+    "questions": [
+      "What do I need to know about my data being used for a specific reason?",
+      "How can I find out what purposes my data will be used for by the company?",
+      "Do companies have to tell me why they're using my personal information before they start collecting it?",
+      "Can I ask a company to stop using my data for a particular purpose?",
+      "What happens if a company changes how they use my data without telling me first?",
+      "How can I find out what purposes my data will be used for by the company?",
+      "Do companies have to tell me about all the ways they might use my personal information?"
+    ]
+  },
+  "def-state": {
+    "plain_english": "This section says 'State' refers to the country as described in a part of our constitution called Article 12.",
+    "questions": [
+      "What does the Constitution say about what we call a State?",
+      "How do I know which article in the Constitution talks about States?",
+      "Can you explain what Article 12 says about the State?",
+      "Who decides on changes to the definition of 'State' in our constitution?",
+      "Is there another part of the law that defines 'State'? If so, where is it?",
+      "What happens if a new article is added to the Constitution and it talks about States differently?",
+      "Can you give me an example of what the State might look like based on Article 12?",
+      "How does this definition affect how we handle personal data related to the State?"
+    ]
+  },
+  "pen-1": {
+    "plain_english": "If a company that handles personal data doesn't protect it properly, they could face a fine up to 250 crores.",
+    "questions": [
+      "How do I know if my company is following the security rules for protecting customer data?",
+      "What happens if there's a leak of customer information in our system?",
+      "Can we avoid getting fined if we have enough insurance money?",
+      "Who decides what the fine will be when someone breaks the data protection rule?",
+      "How do I know which part of my company is responsible for protecting customer data?",
+      "What should I do if I think there was a personal data breach in our system?",
+      "Can we get a discount on the fine if we promise to fix the security issues quickly?",
+      "Is it possible to appeal or reduce the fine if we disagree with how much we have to pay?"
+    ]
+  },
+  "pen-2": {
+    "plain_english": "If someone doesn't tell the Data Protection Board or any affected customer about a personal data problem, they could get fined up to 200 crores.",
+    "questions": [
+      "How do I know if my data was breached?",
+      "What should I do if I think my data might have been shared incorrectly?",
+      "Who can I contact if I believe my personal information has been mishandled?",
+      "Can a company be fined for not informing me about a data breach?",
+      "Is there a limit to how much a company could be punished for this mistake?",
+      "How do I find out what specific data might have been involved in the breach?",
+      "What happens if I disagree with the penalty my company received for not reporting a breach promptly?",
+      "Can I ask for more details about why I was fined?"
+    ]
+  },
+  "pen-3": {
+    "plain_english": "If a company doesn't follow the extra rules for kids as stated in section 9, they could face a penalty up to two hundred crore rupees.",
+    "questions": [
+      "How much can a business be fined if they don’t protect children's data properly?",
+      "What are some examples of additional obligations for companies regarding children’s data?",
+      "Is there a limit on how much a company can be fined for not following these rules for kids?",
+      "Can you give me an idea of what kind of extra responsibilities companies have when dealing with children’s data?",
+      "How does the Digital Personal Data Protection Act, 2023 define 'children' in relation to data protection?",
+      "What happens if a company fails to comply with these additional obligations for kids?",
+      "Is there any specific section or part of the act that outlines what constitutes a breach related to children's data?",
+      "Can you explain why companies are held accountable for protecting children’s data differently from other types of personal data?"
+    ]
+  },
+  "pen-4": {
+    "plain_english": "If a company that deals with lots of customer data doesn't follow the extra rules we set, they could face a fine up to 150 million rupees.",
+    "questions": [
+      "How much can a company be fined for not following our new data rules?",
+      "What are some examples of 'additional obligations' that companies have to follow with customer data?",
+      "Is there any limit on how high this fine can go if they break the rules again?",
+      "Who decides whether or not a company has broken these extra data rules?",
+      "Can we change our new data rules in the future, and would this affect existing fines for past violations?",
+      "What happens if a company breaks multiple parts of our new data rules at once?",
+      "How do we decide what part of the fine to give to the government instead of the company that broke the rules?",
+      "Is there anything else I should know about these extra obligations and the penalties for not following them?"
+    ]
+  },
+  "pen-5": {
+    "plain_english": "If someone doesn't follow what they're supposed to do according to a certain rule, they could face a fine up to Rs. 10,000.",
+    "questions": [
+      "How much can I be fined if I don't comply with the rules?",
+      "What happens if I break the rules set in section 15?",
+      "Is there a maximum amount for fines related to rule-breaking?",
+      "Can you tell me what 'observance of duties' means in this context?",
+      "Who decides whether someone has broken the rules and how much they can be fined?",
+      "What does it mean when it says 'may extend to ten thousand rupees'? Is there a minimum amount too?",
+      "Is there anything I need to do after being fined for not following the rules?",
+      "Can you give me an example of what section 15 might cover?"
+    ]
+  },
+  "pen-6": {
+    "plain_english": "If someone who agreed to follow certain rules gets into trouble for breaking those rules, they could face a fine up to how much they would have been fined if they hadn't agreed to follow them in the first place.",
+    "questions": [
+      "How do I know what the maximum penalty is if I break an agreement with the Board?",
+      "Can I avoid a penalty by not agreeing to follow their rules?",
+      "What happens if someone breaches a rule and doesn’t agree with the fine?",
+      "Is there any way to get my data back if it was part of the agreement?",
+      "How do I know which rules I agreed to follow with the Board?",
+      "If I didn't agree to follow a rule, can I still be penalized for breaking it?",
+      "Can I negotiate the penalty amount if I breach an agreement with the Board?",
+      "What happens if someone breaches multiple agreements with the Board?"
+    ]
+  },
+  "pen-7": {
+    "plain_english": "If someone breaks any rule in our data protection act, they could be fined up to 50 crores (which is a lot of money). ",
+    "questions": [
+      "What happens if I break the rules about protecting personal information? ",
+      "How much can I get in trouble for not following these rules?",
+      "I heard fines are really big. How big exactly can they go? ",
+      "Do you think people will be scared to break data protection rules now that there's a hefty fine? ",
+      "Is it possible for someone to get fined if they accidentally leak personal information? ",
+      "How do we decide how much the penalty should be when someone breaks these rules?",
+      "I'm curious, does this mean I can't lose my job or face other consequences just because of a data protection rule violation? ",
+      "If someone is caught breaking multiple rules at once, would they get more than one fine?"
+    ]
+  }
+}

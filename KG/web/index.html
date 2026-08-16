@@ -1,0 +1,362 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DPDP Act 2023 — assistant</title>
+<style>
+  :root{
+    --bg:#0b0f19; --panel:#111827; --panel2:#151d2e; --line:#1f2a3d;
+    --ink:#e6edf7; --dim:#8fa0bb; --faint:#64748b;
+    --accent:#5b9dff; --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    /* Four steps, ~1.25 apart. Everything picks one of these — the earlier
+       draft drifted to nine sizes between 11 and 15px, which reads as noise
+       rather than hierarchy. */
+    --t1:19px;   /* headings */
+    --t2:15px;   /* body and answers */
+    --t3:12px;   /* supporting detail, quotes, tables */
+    --t4:10px;   /* uppercase micro-labels and tags */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:var(--t2)/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{display:flex;align-items:center;gap:14px;padding:14px 20px;
+         background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  header h1{font-size:var(--t1);margin:0;font-weight:600;letter-spacing:-.2px}
+  header .sub{color:var(--faint);font-size:var(--t3)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+  .dot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(52,211,153,.15)}
+  .dot.off{background:var(--bad);box-shadow:0 0 0 3px rgba(248,113,113,.15)}
+
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 140px}
+  .msg{margin:0 0 26px}
+  .who{font-size:var(--t4);letter-spacing:.11em;text-transform:uppercase;
+       color:var(--faint);margin-bottom:7px}
+  .you{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+       padding:11px 15px;display:inline-block;max-width:80%}
+
+  .answer{white-space:pre-wrap;background:var(--panel);border:1px solid var(--line);
+          border-radius:10px;padding:16px 18px}
+  .answer b{color:#fff}
+  .cursor{display:inline-block;width:7px;height:16px;background:var(--accent);
+          vertical-align:-2px;animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  details.trace{margin:11px 0 0;background:var(--panel);border:1px solid var(--line);
+                border-radius:10px;overflow:hidden}
+  details.trace>summary{cursor:pointer;padding:10px 14px;font-size:var(--t3);
+                        color:var(--dim);user-select:none;list-style:none}
+  details.trace>summary::-webkit-details-marker{display:none}
+  details.trace>summary:hover{background:var(--panel2);color:var(--ink)}
+  .traceBody{padding:4px 14px 12px;border-top:1px solid var(--line)}
+  .prov{display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:var(--t3)}
+  .hop{font:var(--t4) var(--mono);padding:2px 6px;border-radius:5px;flex:none;
+       letter-spacing:.04em}
+  .hop0{background:rgba(91,157,255,.16);color:#93c0ff}
+  .hop1{background:rgba(52,211,153,.14);color:#6ee7b7}
+  .prov .nm{color:var(--ink);font-weight:600}
+  .prov .hn{color:var(--faint)}
+  .prov .via{color:var(--ok);font:var(--t4) var(--mono);opacity:.9;margin-top:2px}
+
+  .secTitle{font-size:var(--t4);letter-spacing:.11em;text-transform:uppercase;
+            color:var(--faint);margin:18px 0 8px;display:flex;gap:8px;align-items:center}
+
+  /* Status is carried by the pill and the swatch, not by a slab down the side.
+     Colour alone never decides anything here — the pill spells the status out. */
+  .cite{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        padding:12px 14px;margin-bottom:8px}
+  .cite.verified{border-color:rgba(52,211,153,.28)}
+  .cite.out_of_context{border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.03)}
+  .cite.unresolved{border-color:rgba(248,113,113,.34);background:rgba(248,113,113,.04)}
+  .citeHead{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .swatch{width:7px;height:7px;border-radius:50%;flex:none}
+  .verified .swatch{background:var(--ok)}
+  .out_of_context .swatch{background:var(--warn)}
+  .unresolved .swatch{background:var(--bad)}
+  .citeHead .id{font:600 var(--t2) var(--mono);color:#fff}
+  .tag{font-size:var(--t4);letter-spacing:.07em;text-transform:uppercase;
+       padding:3px 8px;border-radius:20px;font-weight:700}
+  .tag.verified{background:rgba(52,211,153,.15);color:var(--ok)}
+  .tag.out_of_context{background:rgba(251,191,36,.15);color:var(--warn)}
+  .tag.unresolved{background:rgba(248,113,113,.15);color:var(--bad)}
+  .citeHead .hn{color:var(--dim);font-size:var(--t3)}
+  .quote{margin-top:9px;color:#c9d6ea;font-size:var(--t3);line-height:1.7;
+         padding-left:12px;border-left:1px solid var(--line);
+         max-height:5.6em;overflow:hidden;position:relative;cursor:pointer}
+  .quote.open{max-height:none}
+  .quote:not(.open)::after{content:"";position:absolute;left:0;right:0;bottom:0;
+       height:2.2em;background:linear-gradient(transparent,var(--panel))}
+  .note{margin-top:8px;font-size:var(--t3);color:var(--warn)}
+  .cite.unresolved .note{color:var(--bad)}
+
+  .penWrap{border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+  table.pen{width:100%;border-collapse:collapse;font-size:var(--t3);
+            background:var(--panel)}
+  table.pen th{padding:8px 13px;text-align:left;font-size:var(--t4);font-weight:700;
+               letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+               border-bottom:1px solid var(--line);white-space:nowrap}
+  table.pen td{padding:9px 13px;border-top:1px solid var(--line);vertical-align:top}
+  table.pen td:first-child{font:600 var(--t3) var(--mono);white-space:nowrap;color:#fff}
+  /* The amount column absorbs the slack so "applies to" sits next to its row
+     rather than drifting to the far edge with nothing tying them together. */
+  table.pen td:nth-child(2),table.pen th:nth-child(2){width:100%}
+  table.pen td:last-child{color:var(--dim);font:var(--t3) var(--mono);white-space:nowrap}
+  .authoritative{font-size:var(--t3);color:var(--ok);margin-bottom:7px}
+
+  .meta{margin-top:12px;font:var(--t3) var(--mono);color:var(--faint)}
+  .err{background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.3);
+       color:#fca5a5;border-radius:10px;padding:12px 14px;white-space:pre-wrap}
+
+  footer{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(
+         transparent,var(--bg) 22%);padding:22px 20px 18px}
+  .bar{max-width:1180px;margin:0 auto;display:flex;gap:10px}
+  #q{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+     border-radius:11px;padding:13px 15px;font:var(--t2) inherit;resize:none;
+     max-height:150px;min-height:48px}
+  #q:focus{outline:none;border-color:var(--accent)}
+  #send{background:var(--accent);color:#04122b;border:0;border-radius:11px;
+        padding:0 22px;font:650 var(--t2) inherit;cursor:pointer}
+  #send:disabled{opacity:.45;cursor:not-allowed}
+  .examples{max-width:1180px;margin:0 auto 10px;display:flex;gap:7px;flex-wrap:wrap}
+  .ex{background:var(--panel);border:1px solid var(--line);color:var(--dim);
+      border-radius:20px;padding:6px 12px;font-size:var(--t3);cursor:pointer}
+  .ex:hover{border-color:var(--accent);color:var(--ink)}
+  /* The answer box is pre-wrap so model output keeps its blank lines; the
+     static intro is ordinary prose and must not inherit the source's wrapping. */
+  .hint{color:var(--dim);font-size:var(--t3);line-height:1.8;white-space:normal}
+  .hint p{margin:0 0 9px}
+  .hint p:last-child{margin-bottom:0}
+</style>
+
+<header>
+  <span class="dot" id="dot"></span>
+  <h1>DPDP Act 2023 — assistant</h1>
+  <span class="sub" id="status">connecting…</span>
+  <span class="sub" style="margin-left:auto">every citation is checked against the Act</span>
+</header>
+
+<main id="feed">
+  <div class="msg">
+    <div class="who">Assistant</div>
+    <div class="answer hint">
+      <p>Ask about the Digital Personal Data Protection Act, 2023 in plain English —
+         no legal wording needed.</p>
+      <p>Every answer quotes the Act verbatim. Each citation is then resolved against
+         the knowledge graph and marked <b style="color:var(--ok)">verified</b>,
+         <b style="color:var(--warn)">out of context</b>, or
+         <b style="color:var(--bad)">unresolved</b> — so you can tell a real citation
+         from an invented one. Penalty amounts are read straight from the graph and
+         never pass through the model.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="examples" id="examples"></div>
+  <div class="bar">
+    <textarea id="q" rows="1" placeholder="e.g. our vendor leaked customer phone numbers — what do we have to do?"></textarea>
+    <button id="send">Ask</button>
+  </div>
+</footer>
+
+<script>
+const feed = document.getElementById('feed');
+const box  = document.getElementById('q');
+const send = document.getElementById('send');
+let busy = false;
+
+const EXAMPLES = [
+  "what is the fine if customer data leaks?",
+  "can I text my customers marketing offers?",
+  "a kid signed up on our app — what extra rules apply?",
+  "how do I get a company to delete my data?",
+  "we're a tiny startup, do these rules apply to us?",
+  "can we keep data on servers outside India?",
+];
+EXAMPLES.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'ex'; b.textContent = t;
+  b.onclick = () => { box.value = t; ask(); };
+  document.getElementById('examples').appendChild(b);
+});
+
+const esc = s => (s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+fetch('/api/health').then(r => r.json()).then(h => {
+  document.getElementById('dot').className = 'dot ' + (h.ok ? 'on' : 'off');
+  document.getElementById('status').textContent = h.ok
+    ? `${h.model} · ${h.chunks} provisions · ${h.nodes} graph nodes`
+    : h.detail;
+}).catch(() => {
+  document.getElementById('dot').className = 'dot off';
+  document.getElementById('status').textContent = 'backend unreachable';
+});
+
+box.addEventListener('input', () => {
+  box.style.height = 'auto'; box.style.height = Math.min(box.scrollHeight, 150) + 'px';
+});
+box.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); }
+});
+send.onclick = ask;
+
+function block(who, cls) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg';
+  wrap.innerHTML = `<div class="who">${who}</div>`;
+  const body = document.createElement('div');
+  if (cls) body.className = cls;
+  wrap.appendChild(body);
+  feed.appendChild(wrap);
+  window.scrollTo(0, document.body.scrollHeight);
+  return { wrap, body };
+}
+
+function renderRetrieval(host, d) {
+  const seeds = d.provisions.filter(p => p.hop === 0);
+  const hops  = d.provisions.filter(p => p.hop === 1);
+  const det = document.createElement('details');
+  det.className = 'trace';
+  det.innerHTML = `<summary>How this was found —
+    ${seeds.length} matched directly, ${hops.length} pulled in through the graph
+    · ${d.elapsed_ms} ms${d.vocabulary.length
+      ? ' · read as: ' + esc(d.vocabulary.join(', ')) : ''}</summary>`;
+  const body = document.createElement('div');
+  body.className = 'traceBody';
+  body.innerHTML = d.provisions.map(p => `
+    <div class="prov">
+      <span class="hop hop${p.hop}">${p.hop === 0 ? 'bm25' : 'graph'}</span>
+      <span>
+        <span class="nm">${esc(p.label)}</span>
+        ${p.headnote ? `<span class="hn"> — ${esc(p.headnote)}</span>` : ''}
+        ${p.via ? `<div class="via">via ${esc(p.via)}</div>` : ''}
+      </span>
+    </div>`).join('');
+  det.appendChild(body);
+  host.appendChild(det);
+}
+
+function renderCitations(host, d) {
+  if (d.citations.length) {
+    const bad = d.citations.filter(c => c.status !== 'verified').length;
+    const h = document.createElement('div');
+    h.className = 'secTitle';
+    h.innerHTML = `Citations checked against the Act` +
+      (bad ? ` <span style="color:var(--warn)">· ${bad} need attention</span>` : '');
+    host.appendChild(h);
+
+    d.citations.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'cite ' + c.status;
+      el.innerHTML = `
+        <div class="citeHead">
+          <span class="swatch"></span>
+          <span class="id">${esc(c.label)}</span>
+          <span class="tag ${c.status}">${c.status.replace(/_/g, ' ')}</span>
+          ${c.headnote ? `<span class="hn">${esc(c.headnote)}</span>` : ''}
+        </div>
+        ${c.text ? `<div class="quote">${esc(c.text)}</div>` : ''}
+        ${c.note ? `<div class="note">${esc(c.note)}</div>` : ''}`;
+      const q = el.querySelector('.quote');
+      if (q) q.onclick = () => q.classList.toggle('open');
+      host.appendChild(el);
+    });
+  }
+
+  if (d.penalties.length) {
+    const h = document.createElement('div');
+    h.className = 'secTitle';
+    h.textContent = 'Penalty amounts';
+    host.appendChild(h);
+    const note = document.createElement('div');
+    note.className = 'authoritative';
+    note.textContent = 'read directly from the graph — these never pass through the model';
+    host.appendChild(note);
+    const wrap = document.createElement('div');
+    wrap.className = 'penWrap';
+    wrap.innerHTML = `<table class="pen">
+      <tr><th>Entry</th><th>Maximum penalty</th><th>Applies to</th></tr>
+      ${d.penalties.map(p => `<tr>
+        <td>${esc(p.entry)}</td>
+        <td>${esc(p.amount)}</td>
+        <td>${p.applies_to.length ? esc(p.applies_to.join(', ')) : '—'}</td>
+      </tr>`).join('')}</table>`;
+    host.appendChild(wrap);
+  }
+}
+
+async function ask() {
+  const question = box.value.trim();
+  if (!question || busy) return;
+  busy = true; send.disabled = true;
+  box.value = ''; box.style.height = 'auto';
+
+  block('You', 'you').body.textContent = question;
+  const { wrap, body } = block('Assistant', 'answer');
+  body.innerHTML = '<span class="cursor"></span>';
+  let text = '';
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    // Minimal SSE reader: frames are separated by a blank line, and each frame
+    // carries one `event:` and one `data:` line.
+    //
+    // CRLF is normalised on the way in. sse_starlette terminates lines with
+    // \r\n, so splitting on "\n\n" silently never matches — the stream runs to
+    // completion and renders nothing at all.
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+      let split;
+      while ((split = buf.indexOf('\n\n')) !== -1) {
+        const frame = buf.slice(0, split); buf = buf.slice(split + 2);
+        const ev = (frame.match(/^event:\s*(.*)$/m) || [, 'message'])[1].trim();
+        const raw = frame.split('\n').filter(l => l.startsWith('data:'))
+                         .map(l => l.slice(5).trim()).join('');
+        if (!raw) continue;
+        const d = JSON.parse(raw);
+
+        if (ev === 'retrieval') {
+          renderRetrieval(wrap, d);
+        } else if (ev === 'token') {
+          text += d.t;
+          body.innerHTML = esc(text).replace(
+            /^(Short answer|Why|The law says|What to do|Penalty):/gm, '<b>$1:</b>')
+            + '<span class="cursor"></span>';
+          window.scrollTo(0, document.body.scrollHeight);
+        } else if (ev === 'citations') {
+          body.innerHTML = esc(text).replace(
+            /^(Short answer|Why|The law says|What to do|Penalty):/gm, '<b>$1:</b>');
+          renderCitations(wrap, d);
+        } else if (ev === 'done') {
+          const m = document.createElement('div');
+          m.className = 'meta';
+          m.textContent = `${d.model} · ${(d.elapsed_ms / 1000).toFixed(1)}s · `
+                        + `${d.context_chars.toLocaleString()} chars of statute in context`;
+          wrap.appendChild(m);
+        } else if (ev === 'error') {
+          body.className = 'err';
+          body.textContent = d.message;
+        }
+      }
+    }
+    if (body.querySelector('.cursor')) body.innerHTML = esc(text);
+  } catch (e) {
+    body.className = 'err';
+    body.textContent = 'Request failed: ' + e.message;
+  } finally {
+    busy = false; send.disabled = false; box.focus();
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+}
+box.focus();
+</script>

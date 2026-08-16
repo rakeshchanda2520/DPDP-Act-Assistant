@@ -1,0 +1,11 @@
+# Credentials — never commit. Copy .env.example to .env and fill it in.
+.env
+
+# Disposable: rebuilt in seconds by `python build.py && python index.py`.
+out/
+review/
+
+# NOTE: plain_language.json is deliberately NOT ignored. It costs ~3h of local
+# inference to regenerate, so it is committed and lives outside out/.
+__pycache__/
+*.pyc

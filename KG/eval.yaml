@@ -1,0 +1,84 @@
+# Retrieval eval set.
+#
+# Questions in the words real users type, and the provision that should come
+# back. `test_build.py` scores this and fails below `floor`, so tuning
+# vocab.yaml or the boost weights can no longer quietly trade one question's
+# accuracy for another's.
+#
+# Grow this file whenever a real question misses. That is the whole point —
+# without it, every change to retrieval is a guess.
+#
+#   want:  chunk id (or list of acceptable ids) that must appear in the top-k
+#          seeds. A section id is satisfied by any of its sub-sections too:
+#          `want: s-5` accepts s-5, s-5-1, s-5-2 — retrieving the precise
+#          sub-section is a better answer, not a worse one.
+#   k:     seeds to consider (default 6)
+
+floor: 25          # fail the build below this many hits
+
+cases:
+  # --- penalties: the join a flat vector store cannot make -------------------
+  - q: what is the fine if customer data leaks?
+    want: pen-1
+  - q: penalty for not telling the regulator about a hack
+    want: pen-2
+  - q: how much can we be fined for mishandling children's data?
+    want: pen-3
+  - q: is there a penalty for the customer themselves doing something wrong?
+    want: pen-5
+
+  # --- obligations ----------------------------------------------------------
+  - q: do we need to tell customers what we are collecting and why?
+    want: s-5
+  - q: can I text my customers marketing offers?
+    want: s-6
+  - q: a kid signed up on our app, what extra rules apply?
+    want: s-9
+  - q: who is a Significant Data Fiduciary and what extra do they owe?
+    want: s-10
+  - q: do we have to appoint a data protection officer?
+    want: s-10
+  - q: how long can we keep customer data after they stop using us?
+    want: s-8
+  - q: our vendor handles the data, are we still responsible?
+    want: s-8
+
+  # --- rights ---------------------------------------------------------------
+  - q: how do I get a company to delete my data?
+    want: s-12
+  - q: I want to see what information a company holds about me
+    want: s-11
+  - q: my address is wrong on their records, can I make them fix it?
+    want: s-12
+  - q: someone died, can their family get their account information?
+    want: s-14
+  - q: the company is ignoring me, who do I complain to?
+    want: s-13
+
+  # --- scope and exemptions -------------------------------------------------
+  - q: we are a tiny startup, do all these rules really apply to us?
+    want: s-17-3
+  - q: can we keep data on servers outside india?
+    want: s-16
+  - q: does this law cover paper files in a cabinet?
+    want: [s-3, def-digital-personal-data]   # scope, or the "digital" definition
+  - q: I posted my own details publicly, is that still protected?
+    want: s-3
+
+  # --- definitions ----------------------------------------------------------
+  - q: what counts as personal data?
+    want: def-personal-data
+  - q: who is a data fiduciary?
+    want: def-data-fiduciary
+  - q: at what age is someone still a child under this law?
+    want: def-child
+  - q: what exactly counts as a data breach?
+    want: def-personal-data-breach
+
+  # --- enforcement ----------------------------------------------------------
+  - q: can we appeal a decision we disagree with?
+    want: s-29
+  - q: what happens if we ignore a Board order?
+    want: s-33
+    known_miss: true      # BM25 + vocab reach §29 (appeals) instead; needs
+                          # either a vocab entry or dense retrieval

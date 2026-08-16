@@ -1,0 +1,88 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this repo is
+
+A verbatim knowledge-graph RAG system for the Digital Personal Data Protection Act, 2023 (India), plus a FastAPI + SSE chatbot POC on top of it. Everything lives under `KG/`. Read `KG/FLOW.md` before touching the pipeline — it is the authoritative, numbers-grounded explanation of every stage (PDF extraction, graph construction, chunking, retrieval, why there are no embeddings). `KG/README.md` has the quickstart and file reference.
+
+## Commands
+
+All commands run from `KG/`.
+
+```bash
+# One-time setup
+pip install pdfplumber networkx rank_bm25 pyyaml neo4j snowballstemmer fastapi uvicorn sse_starlette
+ollama pull qwen2.5:3b-instruct   # or qwen2.5:7b-instruct for materially better answers
+
+# Full rebuild (PDF -> graph -> search index)
+python build.py --neo4j     # PDF -> graph; --neo4j also loads into Neo4j (needs .env)
+python build.py             # same, without touching Neo4j
+python index.py             # graph -> 142 BM25-searchable chunks (fast, no LLM)
+python index.py --plain     # also regenerates plain_language.json (~3h local CPU inference — see below)
+
+# Tests
+python test_build.py        # 15 checks: structural invariants + eval.yaml retrieval scoring
+pytest test_build.py         # same, if you prefer the pytest runner
+
+# CLI query (no server)
+python ask.py "what is the fine if customer data leaks?"
+python ask.py --retrieval-only "penalty for a data leak"   # skip the LLM call, just show what was retrieved
+
+# Web app
+uvicorn api:app --port 8000 --reload    # http://127.0.0.1:8000
+```
+
+There is no single-test flag — `test_build.py` is a flat script of `test_*` functions run via `main()`, not pytest-parametrized. To isolate one check, comment out the others in the `tests` list comprehension at the bottom of the file, or run `python -c "import test_build; test_build.test_penalty_join()"` for one function directly.
+
+## Non-obvious setup
+
+- **`.env`** (gitignored, copy from `.env.example`) holds Neo4j credentials and Ollama config (`NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`, `OLLAMA_HOST`, `DPDP_MODEL`). `build.py` loads it itself via a 6-line stdlib parser — no `python-dotenv` dependency.
+- **Neo4j Aura quirk**: some Aura instances reject the usual `neo4j`/`neo4j` user+database pair and require both set to the instance ID instead. Check which pair your instance accepts before assuming a connection failure is a bug.
+- **`plain_language.json`** lives at the repo root (`KG/`), not under `out/`. It costs ~3h of local CPU inference to regenerate and is deliberately excluded from `.gitignore` (unlike everything else in `out/` and `review/`, which are disposable and rebuilt in seconds). Never `rm -rf out` expecting it to be safe — it isn't in `out/` precisely because of a past incident where it was.
+- **Ollama must be running** (`ollama serve`) for `index.py --plain`, `ask.py` (non-`--retrieval-only`), and the web app's `/api/chat` to produce answers. Retrieval-only paths (`build.py`, `index.py` without `--plain`, `ask.py --retrieval-only`, `test_build.py`) never call Ollama.
+- **A 3B model is the current default** (`DPDP_MODEL=qwen2.5:3b-instruct`) and is the known weak link — it has misread Schedule penalty figures and glossed over legal nuance (e.g. conflating "family" with "nominated person" under §14). Retrieval is not the bottleneck; the model is. Prefer `qwen2.5:7b-instruct` for anything beyond a quick smoke test.
+
+## Architecture
+
+The pipeline is five scripts, each a stage, each disposable/regeneratable except the two "expensive" cached outputs (`out/dpdp_graph.json` family and `plain_language.json`):
+
+```
+build.py  → out/dpdp_tree.json, out/dpdp_graph.json, out/schedule.json,
+            out/dpdp.gexf, out/graph.html, out/load.cypher, review/*.md
+            (+ optionally pushes to Neo4j via --neo4j)
+index.py  → out/index.json (142 BM25 chunks); --plain also writes plain_language.json
+llm.py    → thin stdlib HTTP client for Ollama (chat + chat_stream + structured JSON output)
+ask.py    → CLI: question -> vocab.yaml expansion -> BM25 -> graph expansion -> cited answer
+api.py    → FastAPI: same retrieval as ask.py, streamed over SSE, plus citation verification
+web/index.html → single-file chat UI, no build step, consumes the SSE stream
+```
+
+### The two non-negotiable properties (enforced by code, not convention)
+
+1. **Verbatim storage.** Every node's `text` field is the Act's exact words. `build.py` reassembles the *entire* document from the graph in document order and diffs it character-for-character against the raw extracted PDF text; a single dropped/reordered/invented character fails the build (`test_lossless_round_trip`). LLM-generated text (glosses, generated questions) is a strictly separate field, never merged into `text`, and is never quoted or cited in an answer — only used to *find* the right verbatim chunk.
+2. **The graph is authoritative for structured facts.** Penalty amounts, cross-references, and citation validity are never trusted from LLM output — they are read from the graph and either rendered directly (penalty table) or used to verify what the model claimed (citation status: `verified` / `out_of_context` / `unresolved`). See "Citation verification" below.
+
+### Extraction (`build.py`)
+
+The Gazette PDF has three columns per page (marginalia-left, body, marginalia-right) that `pdfplumber`'s naive text extraction merges into one garbled stream. `build.py` derives column boundaries and the indentation ladder (the depth signal that resolves clause markers like `(i)`, which is ambiguous between "sub-clause `(i)`" and "letter-`i`" without positional context) from the PDF's own word coordinates at runtime — nothing is hand-tuned to this specific document. Three typesetting conventions that can't be geometrically derived (headnote-to-section attachment, "bare" cross-reference resolution, illustration boundaries) are written to `review/*.md` for human sign-off and can be corrected via `overrides.yaml` without touching parser code.
+
+### Graph model
+
+Nodes: Act → Chapter → Section → SubSection/Clause/SubClause → Illustration, plus `Definition` nodes (28, one per defined term in §2) and `Penalty` nodes (7, one per Schedule row). Edges include structural containment, `DEFINES`, `MENTIONS` (any provision referencing a defined term), `REFERENCES` (cross-references between sections, resolved via regex + the "bare reference means current section" convention), and `PENALISED_BY` (the join between an obligation and its Schedule penalty — the single edge type that makes the graph worth having, since no embedding-based retrieval can infer that §8(5)'s security-safeguards duty maps to Schedule entry 1's ₹250-crore penalty from text similarity alone).
+
+### Retrieval — no embeddings, by design
+
+Retrieval is BM25 (`rank_bm25`) over the 142 chunks, not a vector store. `FLOW.md` has the full rationale; the short version: the corpus is small (142 chunks), exact statutory terms (section numbers, defined terms, rupee figures) matter more than semantic similarity for this domain, and the vocabulary gap between layperson questions and statutory language is closed by two cheaper, more auditable mechanisms instead:
+- `vocab.yaml` — a hand-maintained synonym map (e.g. "leak" → "personal data breach") applied before BM25 scoring.
+- `plain_language.json` — LLM-generated plain-English questions per chunk (indexed, never cited), so a layperson's phrasing has something to match against even when it shares no vocabulary with the statute.
+
+After BM25 retrieval, `ask.retrieve()` performs one hop of graph expansion from the top hits (following `REFERENCES`, `PENALISED_BY`, `DEFINES`) to pull in provisions the keyword match alone would miss — this is the "Graph" part of GraphRAG. `eval.yaml` (26 hand-written question/expected-provision pairs) is the regression harness for retrieval quality; `test_build.py` fails the build if retrieval accuracy drops below its floor.
+
+### Citation verification (`api.py`)
+
+The FastAPI backend's most important behavior: after the LLM streams an answer, every `§N(x)` / "Schedule entry N" citation it wrote is parsed out and checked against the graph, then labeled `verified` (provision exists and was in the retrieved context), `out_of_context` (provision exists but wasn't retrieved — the model likely hallucinated it from training data), or `unresolved` (no such provision exists at all). This is what lets the frontend show citation trust status instead of asking the user to take the model's word for it. Penalty amounts shown in the UI are read directly from graph `Penalty` nodes, never extracted from the LLM's prose.
+
+### SSE streaming shape
+
+`POST /api/chat` streams four event types in order: `retrieval` (which chunks/graph nodes were pulled in, before generation starts — lets the UI show progress immediately since the LLM hasn't started yet), `token` (incremental answer text), `citations` (the verification result described above, sent after the full answer is available), `done`. `web/index.html` is a single static file with no build tooling — edit it directly, no bundler/transpile step involved.
