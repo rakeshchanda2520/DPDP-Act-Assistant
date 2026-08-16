@@ -80,6 +80,122 @@ through the model at all.
 
 ---
 
+## Running the whole thing, start to finish
+
+Three moving parts: **Ollama** (the LLM), **Neo4j** (the graph — optional), and
+**this repo** (build the data, then serve it). All commands below assume you're
+in `KG/`.
+
+### 0. Prerequisites
+
+| | Check | Install |
+|---|---|---|
+| Python 3.10+ | `python --version` | — |
+| Ollama | `ollama --version` | <https://ollama.com/download> |
+| Neo4j (optional — see below) | — | Desktop, Docker, or [Aura](https://neo4j.com/cloud/aura/) free tier |
+
+The Act PDF (`data/dpdp_act_2023.pdf`) is already in the repo — no download step.
+
+### 1. Python dependencies
+
+```bash
+pip install pdfplumber networkx rank_bm25 pyyaml neo4j snowballstemmer \
+            fastapi uvicorn sse_starlette
+```
+
+### 2. Start Ollama and pull a model
+
+```bash
+ollama serve                       # if it isn't already running as a service
+ollama pull qwen2.5:7b-instruct    # recommended — 3b works but misreads figures
+```
+
+Verify it's reachable:
+
+```bash
+curl http://127.0.0.1:11434/api/tags
+```
+
+### 3. Point at a graph database (optional but recommended)
+
+Pick one:
+
+- **Local Neo4j** — Neo4j Desktop, or:
+  ```bash
+  docker run -d -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/<password> neo4j:5
+  ```
+- **Neo4j Aura** (free, no local install) — create an instance at
+  <https://console.neo4j.io>, download the credentials file it offers.
+
+Either way, copy `.env.example` to `.env` and fill in the four `NEO4J_*` values
+it downloaded or that you set locally:
+
+```bash
+cp .env.example .env
+```
+
+`.env` is gitignored — credentials never get committed. Skip this step entirely
+if you just want the local files (`out/dpdp_graph.json`, `out/graph.html`) and
+don't need a live queryable graph; `build.py` without `--neo4j` still writes all
+of them.
+
+### 4. Build the graph and the search index
+
+```bash
+python build.py --neo4j    # PDF -> graph -> out/ + review/ + Neo4j
+                            # drop --neo4j if you skipped step 3
+python index.py --plain    # graph -> 142 BM25 chunks + LLM-generated question index
+```
+
+`index.py --plain` calls Ollama once per chunk (~142 calls) to generate the
+plain-language layer that lets non-lawyers' phrasing match the statute. It's
+slow on a small local model — **budget up to ~3 hours on a 3B CPU model**, far
+less on 7B/GPU. It's resumable (safe to Ctrl-C and rerun) and writes to
+`plain_language.json` at the repo root, which is committed to the repo — so if
+you're working from a fresh clone that already has it, **you can skip this step
+entirely** and just run `python index.py` (no `--plain`, seconds not hours).
+
+### 5. Verify the build
+
+```bash
+python test_build.py
+```
+
+Expect `15/15 passed`, including the round-trip verbatim check and the
+`eval.yaml` retrieval-accuracy score. Don't skip this — it's what confirms the
+PDF parsed cleanly and retrieval actually works before you put a UI in front of it.
+
+### 6. Run it
+
+**CLI**, fastest way to sanity-check an answer:
+
+```bash
+python ask.py "what is the fine if customer data leaks?"
+python ask.py --retrieval-only "penalty for a data leak"   # skip the LLM, just show retrieval
+```
+
+**Web app** — backend and frontend are the same process; `api.py` serves
+`web/index.html` directly, so there's nothing separate to start for the frontend:
+
+```bash
+uvicorn api:app --port 8000 --reload
+```
+
+Open <http://127.0.0.1:8000>. Type a question, watch it stream, click a citation
+to see the graph's verbatim provision behind it.
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `ask.py` / web app hangs, no tokens stream | Ollama not running, or wrong model name | `ollama serve`; check `DPDP_MODEL` in `.env` matches an installed model (`ollama list`) |
+| `build.py --neo4j` fails to connect | `.env` missing or wrong credentials | re-check `NEO4J_URI`/`NEO4J_USER`/`NEO4J_PASSWORD`/`NEO4J_DATABASE`; on Aura, some instances need the instance ID as both user *and* database, not `neo4j` |
+| `python index.py --plain` looks stuck | Normal — it's ~3h on a small CPU model | watch progress in the terminal; it prints per-chunk; safe to Ctrl-C and rerun later |
+| Web UI loads but citations never appear | Backend can't reach Ollama for the citation-check step | check `/api/health` at <http://127.0.0.1:8000/api/health> |
+| `test_build.py` fails on the round-trip check | `data/dpdp_act_2023.pdf` was swapped or is a different edition | re-run `python build.py` against the original PDF |
+
+---
+
 ## Three guarantees
 
 **1. Verbatim.** Every `text` field is the Act's exact words. `build.py`
