@@ -6,7 +6,7 @@
 >
 > | § | Item | Status |
 > |---|---|---|
-> | 1 | InLegalBERT embeddings | **Blocked** — needs a ~450MB model download; disk was at 99% |
+> | 1 | InLegalBERT embeddings | **Measured and rejected.** InLegalBERT scores 89/101 vs the incumbent MiniLM's 92/101; `bge-base-en-v1.5` ties at 92 for 5× the size. Incumbent retained — see the correction in §1 |
 > | 2 | NLI citation verification | **Built and validated** (`entailment.py`), off by default. Catches both recorded real bugs (§14 at 0.004, §17(3) at 0.001) where citation-existence checking said `verified`; one false positive found and fixed — see §2 |
 > | 3 | Query decomposition | **Built** (`decompose.py`), off by default. Measured: mechanism works, but split quality on the local 3B model is unreliable — see the correction in §3 |
 > | 4 | PageRank authority | **Built** (`build.py` `add_authority`, consumed in `ask.py`). Measured: works as a within-tier tie-breaker, but does **not** fix hub-flooding as this document predicted — see the correction in §4 |
@@ -104,6 +104,42 @@ the current 92/101 hybrid score before deciding to switch. Given this
 project's own measured experience that a plausible-sounding embedding change
 made things *worse* until measured, don't skip the measurement step here
 either.
+
+#### ❌ Measured and rejected — the hypothesis in this section is wrong
+
+Tested against `eval.yaml`'s 101 cases with hybrid retrieval on, everything
+else held constant. `EMBED_MODEL` is now settable via `DPDP_EMBED_MODEL`, so
+anyone can re-run this.
+
+| Embedder | Size | Score | Known-miss |
+|---|---:|---:|---:|
+| `all-MiniLM-L6-v2` (incumbent) | 80 MB | **92/101** | 5 |
+| `law-ai/InLegalBERT` | 534 MB | **89/101** | 6 |
+| `BAAI/bge-base-en-v1.5` | 439 MB | **92/101** | 5 |
+
+**InLegalBERT is worse**, and it broke two cases the generic model gets right
+(§5 notice, §27 Board powers). The reason is the thing this section missed:
+InLegalBERT is a **raw masked-LM checkpoint**, pretrained on Indian court
+*judgments*. It was never contrastively fine-tuned to place similar sentences
+near each other, and mean-pooled MLM hidden states are a well-known weak
+sentence representation. MiniLM is generic but was trained on a billion
+sentence pairs *for retrieval specifically*. **Domain pretraining is not the
+same axis as retrieval-readiness**, and this section conflated them — the
+right InLegalBERT comparison would be against a *contrastively fine-tuned*
+legal embedder, not against a retrieval-trained generic one.
+
+**`bge-base-en-v1.5` ties exactly** — it fixes §6 and breaks §5, netting to
+the same 92. For 5× the disk and slower inference, a tie is a rejection.
+
+The broader finding: at 142 chunks, with `vocab.yaml`, the plain-language
+question layer, BM25, and a cross-encoder reranker already in the pipeline,
+**the embedder is not the bottleneck** — the reranker is doing most of the
+discrimination, and swapping what feeds it barely moves the result. Retrieval
+effort is better spent on the remaining 5 known misses (§13/§14 phrasing gaps)
+than on a bigger encoder.
+
+**Incumbent retained.** No default changed; `DPDP_EMBED_MODEL` exists now so
+the experiment is repeatable rather than folklore.
 
 ---
 

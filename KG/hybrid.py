@@ -46,7 +46,8 @@ from functools import lru_cache
 
 import numpy as np
 
-EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+EMBED_MODEL = os.environ.get("DPDP_EMBED_MODEL",
+                             "sentence-transformers/all-MiniLM-L6-v2")
 RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 RRF_K = 60          # the standard RRF constant from the original paper; not
                     # tuned against this corpus, just the well-known default
@@ -57,6 +58,16 @@ RERANK_POOL = 20    # candidates handed to the cross-encoder — cheap at this
 
 @lru_cache(maxsize=1)
 def _embedder():
+    """Load EMBED_MODEL.
+
+    Raw encoder checkpoints (`law-ai/InLegalBERT`) need no wrapper here:
+    sentence-transformers detects the missing pooling head and composes
+    Transformer + mean pooling itself, logging "Creating a new one with mean
+    pooling". Verified — it loads at dim 768 with pooling_mode='mean', which
+    is the right default for a BERT-family encoder. An explicit
+    models.Transformer + models.Pooling composition was written for this and
+    then deleted as dead code.
+    """
     from sentence_transformers import SentenceTransformer
     return SentenceTransformer(EMBED_MODEL)
 
