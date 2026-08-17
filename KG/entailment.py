@@ -51,11 +51,57 @@ MIN_CLAIM_CHARS = 25
 RE_SECTION_HEADER = re.compile(
     r"^\s*(Short answer|Why|The law says|What to do|Penalty)\s*:", re.IGNORECASE)
 
+# Citation-attribution prefixes, stripped before checking.
+#
+# This is not cosmetic — it fixes a measured false positive. An NLI model
+# scores "Section 29(1) states that X" against premise X at ~0.000, because
+# a claim ABOUT what a document says is not the same proposition as the
+# document's content, and the premise never mentions itself. That reads as a
+# hallucination when it is in fact a near-verbatim quote. Since ask.SYSTEM
+# explicitly instructs the model to write in exactly this form ("The law
+# says: §N(x) — ..."), leaving it unstripped would flag correct, well-formed
+# answers as unsupported — the worst possible failure mode for a feature
+# whose whole purpose is trust.
+RE_ATTRIBUTION = re.compile(
+    r"^\s*(?:according to\s+|under\s+|as (?:per|stated in)\s+)?"
+    r"(?:§\s*\d+[\w()]*|sections?\s+\d+[\w()]*|schedule\s+entry\s+\d+|this (?:section|provision)|it)"
+    r"\s*(?:—|-|,)?\s*"
+    r"(?:states?|says?|provides?|requires?|specifies?|mentions?|notes?)\s+"
+    r"(?:that\s+)?", re.IGNORECASE)
+
 
 @lru_cache(maxsize=1)
 def _model():
+    """Load the cross-encoder, working around a real HF_HUB_OFFLINE trap.
+
+    sentence-transformers' CrossEncoder calls the hub's `model_info`
+    endpoint while constructing, even when every file it needs is already
+    cached. With HF_HUB_OFFLINE=1 that call raises OfflineModeIsEnabled and
+    the load fails outright — so the offline flag, which exists to stop a
+    slow network stalling startup, would instead make the model permanently
+    unloadable. Clearing it just for the duration of construction gets cache
+    reuse without the failure; `local_files_only=True` still keeps the
+    cached path preferred, and the finally-block restores the caller's
+    environment exactly as it was.
+    """
+    import huggingface_hub.constants as hf_constants
     from sentence_transformers import CrossEncoder
-    return CrossEncoder(MODEL)
+
+    # Patch the CONSTANT, not the env var: huggingface_hub reads
+    # HF_HUB_OFFLINE once at import time into this module-level flag, so
+    # os.environ.pop() here would be silently ineffective (it was — this is
+    # the second fix for this bug). Restored in `finally` so the offline
+    # behaviour every other module relies on is unchanged afterwards.
+    saved = hf_constants.HF_HUB_OFFLINE
+    hf_constants.HF_HUB_OFFLINE = False
+    try:
+        try:
+            return CrossEncoder(MODEL, local_files_only=True)
+        except TypeError:
+            # Older sentence-transformers doesn't forward local_files_only.
+            return CrossEncoder(MODEL)
+    finally:
+        hf_constants.HF_HUB_OFFLINE = saved
 
 
 def check() -> str | None:
@@ -79,6 +125,8 @@ def split_claims(answer: str) -> list[str]:
     claims = []
     for raw in re.split(r"(?<=[.!?])\s+|\n+", answer):
         line = RE_SECTION_HEADER.sub("", raw).strip()
+        # Reduce "§29(1) states that X" to plain "X" — see RE_ATTRIBUTION.
+        line = RE_ATTRIBUTION.sub("", line).strip()
         if len(line) >= MIN_CLAIM_CHARS:
             claims.append(line)
     return claims

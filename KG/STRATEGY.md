@@ -7,7 +7,7 @@
 > | § | Item | Status |
 > |---|---|---|
 > | 1 | InLegalBERT embeddings | **Blocked** — needs a ~450MB model download; disk was at 99% |
-> | 2 | NLI citation verification | **Built** (`entailment.py`), off by default; model download blocked on disk space, so *not yet measured* |
+> | 2 | NLI citation verification | **Built and validated** (`entailment.py`), off by default. Catches both recorded real bugs (§14 at 0.004, §17(3) at 0.001) where citation-existence checking said `verified`; one false positive found and fixed — see §2 |
 > | 3 | Query decomposition | **Built** (`decompose.py`), off by default. Measured: mechanism works, but split quality on the local 3B model is unreliable — see the correction in §3 |
 > | 4 | PageRank authority | **Built** (`build.py` `add_authority`, consumed in `ask.py`). Measured: works as a within-tier tie-breaker, but does **not** fix hub-flooding as this document predicted — see the correction in §4 |
 > | 5 | Conformal abstention | **Not started** — needs ~100 labelled calibration questions; 6 exist |
@@ -150,7 +150,7 @@ call.
 extension is `answer_eval.yaml` cases specifically targeting known
 misstatement patterns (which this project already has two of).
 
-#### ⚠️ Built but NOT yet measured — model download blocked
+#### ✅ Built and validated — it catches the exact bug it was built for
 
 Implemented as `entailment.py` (`DPDP_ENTAILMENT=1`), wired into `api.py`'s
 citation stage: each answer sentence is scored against the verbatim text of
@@ -167,13 +167,44 @@ model's own `id2label` config rather than assumed — it is not alphabetical
 and not consistent across NLI checkpoints, and guessing it wrong silently
 inverts the entire check.
 
-**It has not been run against real answers yet.** The
-`cross-encoder/nli-deberta-v3-base` download filled the disk (an unfiltered
-`snapshot_download` pulls every format variant — TF, ONNX, OpenVINO — not
-just the ~400MB of PyTorch weights actually needed) and had to be removed.
-Until it runs, treat this as *code-complete but unvalidated*: the §14
-regression case in `answer_eval.yaml` is the specific thing it should be
-measured against first.
+**Measured on the two errors this project actually recorded, and the
+separation is decisive:**
+
+| Claim, checked against the provision it cites | P(entail) | Verdict |
+|---|---:|---|
+| §14 — *"family members can exercise their rights"* — **the real 3B bug** | **0.004** | `unsupported` ✅ |
+| §14 — *"may nominate another individual…"* (correct) | **0.998** | `supported` ✅ |
+| §17(3) — *"startups are automatically exempt"* — the exemption trap | **0.001** | `unsupported` ✅ |
+| §17(3) — *"the Central Government may notify…"* (correct) | **0.994** | `supported` ✅ |
+
+Both are cases where `check_citations()` returns `verified` — the provision
+exists and was retrieved — so this is genuinely new signal, not a
+restatement of a check the system already had.
+
+**One real false positive found and fixed, worth recording.** A near-verbatim
+quote — *"Section 29(1) states that any person aggrieved by an order… may
+prefer an appeal"* — initially scored **0.000**, i.e. it looked like a
+hallucination. Cause: it is a *meta-statement* ("the document says X")
+rather than an assertion of X, and NLI models do not treat the two as
+equivalent — the premise never refers to itself. This matters more than a
+curiosity, because `ask.SYSTEM` explicitly instructs the model to write in
+exactly that form (`The law says: §N(x) — "…"`), so unstripped it would
+have flagged well-formed *correct* answers as unsupported — the worst
+possible failure for a trust feature. Stripping citation-attribution
+prefixes before checking took that same claim from 0.000 to **0.996**, with
+the §14 bug still correctly caught at 0.004.
+
+**Two implementation traps, both real, both hit here:**
+1. An unfiltered `snapshot_download` pulls every format variant — 9 ONNX
+   builds plus duplicate `.bin` and `.safetensors` weights, ~3.6GB — and
+   filled the disk. Pass explicit `allow_patterns` (config + safetensors +
+   tokenizer ≈ 749MB).
+2. `HF_HUB_OFFLINE=1` makes this model *permanently unloadable*, because
+   sentence-transformers calls the hub's `model_info` endpoint during
+   construction even with everything cached. `os.environ.pop()` does not fix
+   it — `huggingface_hub` reads the flag into a module constant at import
+   time — so `entailment.py` patches `huggingface_hub.constants.HF_HUB_OFFLINE`
+   for the duration of the load and restores it afterwards.
 
 ---
 
