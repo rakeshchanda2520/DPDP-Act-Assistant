@@ -876,7 +876,59 @@ def build_graph(tree: Tree, defs, xrefs, citations, schedule, meta) -> nx.MultiD
                    page=c["page"], verbatim=True)
 
     G.graph.update(meta)
+    add_authority(G)
     return G
+
+
+# Weights for the authority computation below. REFERENCES is a deliberate,
+# drafted cross-reference — one provision explicitly pointing at another — so
+# it is the real signal of what the Act itself treats as load-bearing.
+# PENALISED_BY is a genuine structural join and counts for half; there are
+# only 6.
+#
+# MENTIONS is deliberately EXCLUDED, and this was measured rather than
+# assumed. Including it at any weight makes every top-authority node a
+# Definition, because all 605 MENTIONS edges point *into* the 28 definitions
+# — the result then measures "how often is this term used", not "how
+# load-bearing is this provision", which is the opposite of what expansion
+# needs. With MENTIONS excluded the ranking is immediately sensible:
+# §29(1) (right of appeal), §33 (penalties), §6 (consent), the Schedule.
+AUTHORITY_WEIGHTS = {"REFERENCES": 1.0, "PENALISED_BY": 0.5}
+
+
+def add_authority(G: nx.MultiDiGraph) -> None:
+    """Store a PageRank score on every node, computed over the Act's own
+    citation structure.
+
+    Network centrality predicts a provision's practical importance better
+    than a raw count of how many things point at it — a provision cited by
+    heavily-cited provisions matters more than one cited the same number of
+    times by peripheral ones. Computed once here at build time, never per
+    query, and consumed by `ask.retrieve()` to keep high-fan-out hub nodes
+    (§40(2) cites nearly a third of the Act) from crowding out genuinely
+    relevant provisions during graph expansion.
+
+    Structural HAS_* edges are excluded on purpose: they encode containment,
+    not endorsement. Including them would just rediscover the document
+    outline — every section would "cite" its own sub-sections — and rank
+    long sections above important ones.
+    """
+    weighted = nx.DiGraph()
+    weighted.add_nodes_from(G.nodes())
+    for src, dst, data in G.edges(data=True):
+        w = AUTHORITY_WEIGHTS.get(data.get("type"))
+        if not w:
+            continue
+        # Collapse the MultiDiGraph's parallel edges into one weighted edge
+        # per pair — nx.pagerank reads `weight` off a simple DiGraph.
+        if weighted.has_edge(src, dst):
+            weighted[src][dst]["weight"] += w
+        else:
+            weighted.add_edge(src, dst, weight=w)
+
+    scores = nx.pagerank(weighted, weight="weight") if weighted.number_of_edges() else {}
+    for node_id in G.nodes():
+        G.nodes[node_id]["authority"] = round(scores.get(node_id, 0.0), 6)
 
 
 def act_metadata(tree: Tree) -> dict:

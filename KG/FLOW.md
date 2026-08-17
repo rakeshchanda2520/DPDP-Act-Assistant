@@ -606,12 +606,25 @@ reference to §10(2)(a) surfaces the section that contains it.
 
 ### Better approach?
 
-- **Two-hop with decay** for multi-step questions (*"if our processor in
-  Singapore leaks children's data, what do we owe?"* touches §8, §9, §16 and the
-  Schedule). Currently one hop; two hops need a decay factor to avoid pulling in
-  half the Act.
+- ~~**Two-hop with decay**~~ — **done.** `ask.py` now expands up to `MAX_HOPS`
+  (2) with a `HOP_DECAY` weight per hop, and `MENTIONS` is barred from the
+  final hop so 605 exhaustive edges can't flood the context. Implementing it
+  also surfaced a real pre-existing bug: expansion edges are recorded on
+  *un-chunked child nodes* (a short section like §33 keeps its
+  `REFERENCES` on `s-33-1`, `s-33-2-d`, …), so before the fix `adj["s-33"]`
+  was empty and expansion could never leave a short section at all — only
+  long, sub-chunked sections ever expanded.
+- **Node authority (partially done).** `build.py` now stores a PageRank
+  score per node over `REFERENCES` + `PENALISED_BY`, used as a tie-breaker
+  *within* an expansion priority tier. Two honest caveats: it does not solve
+  hub-flooding (a hub like §40(2) arrives via its edge *type*, which
+  authority never overrides), and `eval.yaml` cannot measure it at all,
+  because the eval scores seeds only (`hop == 0`) while authority affects
+  `hop >= 1`. Establishing whether it actually helps needs an
+  expansion-quality eval that does not exist yet.
 - **Learned edge weighting** — which edge types actually help, per intent,
-  measured against the eval set rather than hand-assigned.
+  measured against the eval set rather than hand-assigned. Still open, and
+  the natural successor to the hand-assigned `EXPAND_PRIORITY` table.
 - **Cypher-side expansion** now that the graph is in Neo4j: one query doing
   seeds + traversal + ranking server-side.
 
@@ -740,10 +753,11 @@ stemmer, and the ±2 score swing from non-deterministic generation.
 
 | Weakness | Severity | Fix |
 |---|---|---|
-| **The local 3B model** is the weakest component by far. It misread a Schedule figure, and read §14 as "family can step in" when only a *nominated* person qualifies | **High** | `ollama pull qwen2.5:7b-instruct` — retrieval is not the problem |
-| No embeddings → paraphrase questions with no shared root can miss (*"Singapore"* → §16) | Medium | hybrid BM25 + dense with RRF |
-| One-hop expansion only | Medium | two hops with decay for compound questions |
-| 26 eval questions is a small set | Medium | grow to ~100; the harness is already there |
+| **The local 3B model** is the weakest component by far. It misread a Schedule figure, and read §14 as "family can step in" when only a *nominated* person qualifies | **High** | `DPDP_PROVIDER=claude`, or `ollama pull qwen2.5:7b-instruct` — retrieval is not the problem. Both errors are now permanent regression cases in `answer_eval.yaml`. Its weakness has since shown up in a third place: as a *query decomposer* it drops threads and invents out-of-scope sub-questions (see `decompose.py`) |
+| No embeddings → paraphrase questions with no shared root can miss (*"Singapore"* → §16) | Medium | **Addressed, opt-in:** `hybrid.py` (BM25 + dense, fused with RRF, cross-encoder reranked) scores 92/101 vs BM25's 90/101 and cuts `known_miss` from 11 to 5. Off by default until a domain embedder (InLegalBERT) is measured |
+| ~~One-hop expansion only~~ | — | **Done** — two hops with decay; see Stage 7 |
+| ~~26 eval questions is a small set~~ | — | **Done** — 101 cases, every one verified against real retrieval before being added; plus `answer_eval.yaml`, a separate harness for whether the model *used* what was retrieved correctly |
+| **Citations are checked for existence, not for content.** A provision that exists and was retrieved is marked `verified` even if the answer misstates what it says — exactly how the §14 error passed unnoticed | **High** | `entailment.py` (NLI entailment per claim), built but not yet validated — see STRATEGY.md §2 |
 | One-hop `MENTIONS` is noisy (605 edges) | Low | already deprioritised and capped |
 | DPDP Rules 2025 not included | Contextual | the graph is versioned; layer them in without a rebuild |
 

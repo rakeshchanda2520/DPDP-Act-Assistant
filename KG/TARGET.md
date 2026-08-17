@@ -16,6 +16,13 @@
 > disabled. The rest of this document is the original plan, kept as design
 > rationale — cross-reference it against the code before assuming a described
 > behavior is still exactly how something works.
+>
+> **See also `STRATEGY.md`**, which covers answer-quality techniques from the
+> legal-AI research literature that sit alongside these phases. Four of its
+> items are now built (PageRank node authority, query decomposition, NLI
+> entailment checking, and Langfuse tracing from this document's ops work);
+> its status table records which are measured, which are unvalidated, and —
+> importantly — two predictions that measuring proved wrong.
 
 This is a **plan**, not merely a changelog — the reasoning below is what should
 guide any future extension of these phases, not just a record of what shipped.

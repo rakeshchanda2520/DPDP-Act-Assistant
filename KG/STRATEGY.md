@@ -1,12 +1,31 @@
-# STRATEGY — legal-RAG techniques this project hasn't used yet
+# STRATEGY — legal-RAG techniques from the research literature
 
-This is a **research digest and plan, not a changelog**. Nothing in the
-codebase has changed. It complements `TARGET.md`: that document is about
-*production hardening* (model, latency, ops, eval depth) using techniques
-already decided on. This document is about *answer quality and grounding*
-techniques from the wider legal-AI research literature that this project does
-**not** currently use — what they are, why they'd help *this specific
-system*, and what they'd cost.
+> **Implementation status (measured, not assumed).** Four of the nine items
+> below have now been built; the findings corrected two of this document's
+> own predictions, which are marked inline where that happened.
+>
+> | § | Item | Status |
+> |---|---|---|
+> | 1 | InLegalBERT embeddings | **Blocked** — needs a ~450MB model download; disk was at 99% |
+> | 2 | NLI citation verification | **Built** (`entailment.py`), off by default; model download blocked on disk space, so *not yet measured* |
+> | 3 | Query decomposition | **Built** (`decompose.py`), off by default. Measured: mechanism works, but split quality on the local 3B model is unreliable — see the correction in §3 |
+> | 4 | PageRank authority | **Built** (`build.py` `add_authority`, consumed in `ask.py`). Measured: works as a within-tier tie-breaker, but does **not** fix hub-flooding as this document predicted — see the correction in §4 |
+> | 5 | Conformal abstention | **Not started** — needs ~100 labelled calibration questions; 6 exist |
+> | 6 | Contextual retrieval | **Not started** — schema change is trivial, but needs a ~3h `plain_language.json` regeneration to take effect |
+> | 7 | Temporal graph | **Deliberately not started** — design-only until the Rules extraction exists, per this document's own recommendation |
+> | 8 | Self-consistency | **Not started** |
+> | 9 | Multi-agent verification | **Partially covered** by §2's separate-verifier design |
+>
+> Nothing built here is on by default. Every one is a documented env-var
+> opt-in, for the same reason `hybrid.py` is: unmeasured is not the same as
+> better, and this project's own history includes a plausible-sounding
+> retrieval "improvement" that measured *worse* and was reverted.
+
+This is a **research digest and plan**. It complements `TARGET.md`: that
+document is about *production hardening* (model, latency, ops, eval depth)
+using techniques already decided on. This document is about *answer quality
+and grounding* techniques from the wider legal-AI research literature — what
+they are, why they'd help *this specific system*, and what they'd cost.
 
 Everything below is sourced from real 2024–2026 research and shipped legal-AI
 products, not invented. Sources are linked inline and collected at the bottom.
@@ -131,6 +150,31 @@ call.
 extension is `answer_eval.yaml` cases specifically targeting known
 misstatement patterns (which this project already has two of).
 
+#### ⚠️ Built but NOT yet measured — model download blocked
+
+Implemented as `entailment.py` (`DPDP_ENTAILMENT=1`), wired into `api.py`'s
+citation stage: each answer sentence is scored against the verbatim text of
+the provisions it cites, and sentences below the entailment threshold come
+back in a new `claims` field on the `citations` SSE event and in the audit
+log. Answer-format scaffolding (`Short answer:`, `Why:`, …) is stripped
+before checking, since those are not legal claims.
+
+The design detail worth keeping: a claim counts as supported if **any** cited
+provision entails it, so an answer legitimately drawing on three provisions
+isn't penalised because its second sentence is grounded in the third
+provision rather than the first. Entailment label order is read from the
+model's own `id2label` config rather than assumed — it is not alphabetical
+and not consistent across NLI checkpoints, and guessing it wrong silently
+inverts the entire check.
+
+**It has not been run against real answers yet.** The
+`cross-encoder/nli-deberta-v3-base` download filled the disk (an unfiltered
+`snapshot_download` pulls every format variant — TF, ONNX, OpenVINO — not
+just the ~400MB of PyTorch weights actually needed) and had to be removed.
+Until it runs, treat this as *code-complete but unvalidated*: the §14
+regression case in `answer_eval.yaml` is the specific thing it should be
+measured against first.
+
 ---
 
 ### 3. Query decomposition for compound questions
@@ -176,6 +220,35 @@ one"? That requires tightening the compound-question eval cases from
 OR-semantics to AND-semantics once decomposition ships, which the current
 `eval.yaml` comment already flags as future work.
 
+#### ✅ Built — and the "a small model is adequate" claim above is wrong
+
+Implemented as `decompose.py` (`DPDP_DECOMPOSE=1` or `ask.py --decompose`).
+The *merge* mechanism works exactly as designed — retrieving the motivating
+question pulled 12 seeds instead of 6, correctly adding §8's security and
+breach duties.
+
+But this section claimed decomposition is "pattern-matching, not legal
+reasoning, so a small local model is adequate here." **Measured on the local
+3B model, that is not true.** Across four compound test questions:
+
+| Question shape | Result |
+|---|---|
+| Clean coordination (*"delete their data **and also** complain to the Board"*) | **Good** — two faithful, standalone sub-questions |
+| Narrative scenario (*"processor in another country lost a child's records, what do we owe and to whom"*) | **Poor** — produced only `"what do we owe?"`, silently dropping both the cross-border and children's-data threads, so §16 still was not retrieved |
+| Multi-clause scenario (*"transfer data abroad without telling anyone and it leaks"*) | **Bad** — invented *"How does international data protection differ from domestic regulations?"*, a topic wholly outside this Act, in direct violation of the prompt's explicit "never invent a topic" rule |
+
+So decomposition is only as good as the splitter, and a 3B model is not a
+reliable splitter for scenario-shaped legal questions — which is the same
+conclusion the rest of this project keeps reaching about that model, just
+arrived at from a new direction. This is precisely why the design keeps the
+original question first and merges additively: a bad split adds noise to
+the context but can never remove a provision the undecomposed query would
+have found, so the failure mode is degraded-to-baseline rather than broken.
+
+**Re-evaluate this with `DPDP_PROVIDER=claude` before judging the technique
+itself** — the research it comes from assumes a competent decomposer, and
+what was measured here is the 3B model's limitation, not the method's.
+
 ---
 
 ### 4. Provision authority scoring (PageRank over the citation graph) — a free signal this project already has the data for
@@ -217,6 +290,42 @@ flagged as open problems in this project's own code comments:
 `pagerank()` built in; this is a ~15-line addition to `build.py`'s existing
 graph-construction pass, stored as a `pagerank` field on each graph node, no
 new dependency.
+
+#### ✅ Built — and two things this section got wrong
+
+Implemented as `build.py`'s `add_authority()` (stored as an `authority`
+field per node) and consumed in `ask.py`'s expansion as a within-tier
+tie-breaker. Two corrections from actually measuring it:
+
+**1. `MENTIONS` had to be excluded entirely, not merely down-weighted.**
+This section proposed weighting `REFERENCES` above `MENTIONS`. That is not
+enough: with `MENTIONS` included at *any* weight, every single top-authority
+node came out a Definition, because all 605 `MENTIONS` edges point *into*
+the 28 definitions. The result measured "how often is this term used", not
+"how load-bearing is this provision" — the opposite of what expansion needs.
+With `MENTIONS` dropped and only `REFERENCES` (1.0) + `PENALISED_BY` (0.5)
+counted, the ranking is immediately sensible: §29(1) right of appeal, §33
+penalties, §6 consent, the Schedule.
+
+**2. It does NOT fix the §40(2) hub-flooding problem, which was the main
+motivation given above.** §40(2) does score low (0.0021, the floor) exactly
+as hoped — but it still gets pulled into expansion anyway, because it
+arrives via a `CITED_BY` edge whose *tier* (`EXPAND_PRIORITY`) authority
+never overrides. Authority only reorders candidates *within* one tier; it
+cannot demote across tiers, and deliberately so — letting it do that would
+mean a merely-mentioned provision could outrank a genuinely cited one.
+Hub-flooding is a distinct problem needing a distinct fix (penalising a
+*source* node's out-degree, rather than ranking a *target* node's
+in-degree), which is not what PageRank measures.
+
+**3. `eval.yaml` structurally cannot measure this change.** The eval scores
+seeds only (`hop == 0`); authority only affects expansion (`hop >= 1`).
+Before/after scores are identical (90/101 BM25, 92/101 hybrid) and that is
+expected, not evidence of either success or failure. Kept because the signal
+is principled, free, and useful to have on the nodes — but an honest
+assessment is that its practical benefit here is currently *unproven*, and
+would need an expansion-quality eval (which does not exist yet) to
+establish.
 
 ---
 

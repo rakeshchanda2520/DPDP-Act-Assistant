@@ -42,6 +42,8 @@ from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 import ask
+import decompose
+import entailment
 import llm
 import observability
 
@@ -135,6 +137,7 @@ class Question(BaseModel):
     k: int = Field(default=6, ge=1, le=15)
     parent_doc: bool = False
     hybrid: bool | None = None  # None = defer to DPDP_HYBRID env var
+    decompose: bool | None = None  # None = defer to DPDP_DECOMPOSE env var
 
 
 # --------------------------------------------------------------------------- #
@@ -225,7 +228,10 @@ def health() -> dict:
             "nodes": len(STATE["graph"]["nodes"]),
             "build_id": STATE["build_id"],
             "tracing": {"enabled": observability.ENABLED,
-                       "detail": observability.check() or ("ready" if observability.ENABLED else "not configured")}}
+                       "detail": observability.check() or ("ready" if observability.ENABLED else "not configured")},
+            "entailment": {"enabled": entailment.ENABLED,
+                          "detail": entailment.check() or ("ready" if entailment.ENABLED else "not configured")},
+            "decompose": decompose.ENABLED}
 
 
 @app.get("/api/provision/{node_id}")
@@ -263,13 +269,21 @@ async def chat(q: Question) -> EventSourceResponse:
             #    of blank.
             with observability.step("retrieve", as_type="retriever",
                                     input=q.question) as retr_span:
-                results, trace = await asyncio.to_thread(
-                    ask.retrieve, STATE["index"], STATE["graph"], STATE["vocab"],
-                    q.question, q.k, q.parent_doc, q.hybrid)
+                use_decompose = decompose.ENABLED if q.decompose is None else q.decompose
+                if use_decompose:
+                    results, trace = await asyncio.to_thread(
+                        decompose.retrieve_decomposed, ask.retrieve, STATE["index"],
+                        STATE["graph"], STATE["vocab"], q.question, q.k,
+                        q.parent_doc, q.hybrid, llm)
+                else:
+                    results, trace = await asyncio.to_thread(
+                        ask.retrieve, STATE["index"], STATE["graph"], STATE["vocab"],
+                        q.question, q.k, q.parent_doc, q.hybrid)
                 if retr_span:
                     retr_span.update(output=[r["node_id"] for r in results],
                                      metadata={"vocab_hits": trace["vocab_hits"],
-                                              "intents": trace["intents"]})
+                                              "intents": trace["intents"],
+                                              "sub_questions": trace.get("sub_questions", [])})
 
             if not results:
                 audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
@@ -370,14 +384,33 @@ async def chat(q: Question) -> EventSourceResponse:
             with observability.step("verify_citations", as_type="evaluator",
                                     input=answer) as verify_span:
                 citations = check_citations(answer, retrieved_ids)
+                # check_citations answers "does this provision exist and was
+                # it retrieved". It cannot answer "is what the answer SAID
+                # about it true" — the §14 family-vs-nominated error passed
+                # it cleanly. Entailment checking closes that gap when
+                # enabled; see entailment.py.
+                claims = []
+                if entailment.ENABLED:
+                    try:
+                        claims = await asyncio.to_thread(
+                            entailment.verify, answer,
+                            [c.get("text", "") for c in citations])
+                    except Exception as e:
+                        # Verification is an assurance layer, never a
+                        # prerequisite for answering — a failure here must
+                        # degrade to "unchecked", not break the response.
+                        print(f"entailment check failed: {e}", file=sys.stderr)
                 if verify_span:
                     verify_span.update(output=[{"id": c["id"], "status": c["status"]}
-                                               for c in citations])
+                                               for c in citations],
+                                       metadata={"unsupported_claims": sum(
+                                           1 for c in claims if c["status"] == "unsupported")})
 
             elapsed_ms = int((time.time() - started) * 1000)
             yield {"event": "citations", "data": json.dumps({
                 "citations": citations,
                 "penalties": penalty_facts(results),
+                "claims": claims,
             })}
             yield {"event": "done", "data": json.dumps({
                 "elapsed_ms": elapsed_ms,
@@ -408,6 +441,7 @@ async def chat(q: Question) -> EventSourceResponse:
                              for r in results],
                 "answer": answer,
                 "citations": [{"id": c["id"], "status": c["status"]} for c in citations],
+                "claims": claims,
             })
 
     return EventSourceResponse(stream())

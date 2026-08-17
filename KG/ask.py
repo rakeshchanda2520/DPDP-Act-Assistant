@@ -35,6 +35,7 @@ from pathlib import Path
 import yaml
 from rank_bm25 import BM25Okapi
 
+import decompose
 import llm
 
 # Windows consoles default to cp1252 and would crash on the Act's curly
@@ -291,6 +292,14 @@ def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int,
             if target_chunk:
                 adj[target_chunk["node_id"]].append((e["source"], REVERSIBLE[e["type"]]))
 
+    # PageRank over the Act's own REFERENCES/PENALISED_BY structure, computed
+    # once at build time (see build.py's add_authority). Used below purely as
+    # a tie-breaker *within* an existing priority tier — it never reorders
+    # edge types, so a cited provision still always beats a merely-mentioned
+    # one; it only decides which of several equally-ranked candidates is the
+    # more load-bearing provision.
+    authority = {n["id"]: n.get("authority", 0.0) for n in graph["nodes"]}
+
     picked = {c["id"]: c for c in seeds}
     frontier = seeds
     for hop in range(1, MAX_HOPS + 1):
@@ -305,10 +314,13 @@ def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int,
                     continue
                 neighbour = chunk_for(target)
                 if neighbour and neighbour["id"] not in picked:
-                    candidates.append((EXPAND_PRIORITY[etype], rank, neighbour, node, etype))
+                    candidates.append((EXPAND_PRIORITY[etype], rank,
+                                       -authority.get(neighbour["node_id"], 0.0),
+                                       neighbour, node, etype))
 
         added = []
-        for prio, rank, neighbour, node, etype in sorted(candidates, key=lambda t: (t[0], t[1])):
+        for prio, rank, _auth, neighbour, node, etype in sorted(
+                candidates, key=lambda t: (t[0], t[1], t[2])):
             if len(picked) - len(seeds) >= MAX_EXPANDED:
                 break
             weight = node["weight"] * HOP_DECAY
@@ -376,6 +388,9 @@ def main() -> int:
     ap.add_argument("--hybrid", action="store_true",
                     help="dense embeddings + RRF fusion + cross-encoder rerank "
                          "(overrides DPDP_HYBRID for this run)")
+    ap.add_argument("--decompose", action="store_true",
+                    help="split a compound question and retrieve each part "
+                         "separately (overrides DPDP_DECOMPOSE for this run)")
     ap.add_argument("--provider", choices=["ollama", "claude"],
                     help="override DPDP_PROVIDER for this run")
     args = ap.parse_args()
@@ -388,14 +403,25 @@ def main() -> int:
     question = " ".join(args.question)
 
     index, graph, vocab = load()
-    results, trace = retrieve(index, graph, vocab, question, args.k, parent_doc=args.parent_doc,
-                              hybrid=(True if args.hybrid else None))
+    if args.decompose or decompose.ENABLED:
+        results, trace = decompose.retrieve_decomposed(
+            retrieve, index, graph, vocab, question, args.k,
+            parent_doc=args.parent_doc, hybrid=(True if args.hybrid else None),
+            llm_module=llm)
+    else:
+        results, trace = retrieve(index, graph, vocab, question, args.k,
+                                  parent_doc=args.parent_doc,
+                                  hybrid=(True if args.hybrid else None))
 
     if not results:
         print("nothing retrieved — the question may be outside this Act.")
         return 1
 
     print(f"question : {question}")
+    # The split is the model's, so show it — a wrong decomposition should be
+    # visible in the trace, not silently shaping what got retrieved.
+    for sub in trace.get("sub_questions", [])[1:]:
+        print(f"   + sub  : {sub}")
     if trace["vocab_hits"]:
         print(f"vocabulary: {', '.join(trace['vocab_hits'])}")
     if trace["intents"]:
