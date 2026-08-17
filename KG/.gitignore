@@ -9,3 +9,6 @@ review/
 # inference to regenerate, so it is committed and lives outside out/.
 __pycache__/
 *.pyc
+
+# Audit trail: grows with every real request, never something to check in.
+logs/

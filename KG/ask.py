@@ -45,6 +45,10 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).parent
 OUT = ROOT / "out"
+# Off by default — see hybrid.py's module docstring for why. `retrieve()`'s
+# own `hybrid` parameter always overrides this for programmatic callers
+# (eval_answers.py, test_build.py) that need to test both paths explicitly.
+HYBRID_DEFAULT = os.environ.get("DPDP_HYBRID", "") not in ("", "0", "false")
 # A local 3B-8B model degrades fast on a wall of statute, so the context budget
 # is much tighter than it would be for a frontier model. Raise both together if
 # you switch to a larger model.
@@ -57,7 +61,15 @@ ANSWER_NUM_CTX = int(os.environ.get("DPDP_ANSWER_NUM_CTX", "16384"))
 # definitions. Lower number wins; the cap keeps the prompt focused.
 EXPAND_PRIORITY = {"PENALISED_BY": 0, "PENALISES": 0, "REFERENCES": 1,
                    "CITED_BY": 1, "DEFINES": 2, "HAS_ENTRY": 3, "MENTIONS": 4}
-MAX_EXPANDED = 8
+MAX_EXPANDED = 10  # was 8; two hops need a little more room than one to be reachable
+MAX_HOPS = 2
+# A hop-2 neighbour is weighted down relative to hop-1, not dropped — a
+# compound question ("processor abroad leaks a child's data") needs §8, §9,
+# §16 and the Schedule assembled from provisions that are two edges apart, not
+# one. Unbounded two-hop over 605 MENTIONS edges would pull in half the Act,
+# so MENTIONS never expands past hop 1 (see the hop cutoff below) and every
+# hop multiplies score by this factor instead of counting hops as equal.
+HOP_DECAY = 0.6
 
 # Some edges must be walked backwards as well as forwards. A question about a
 # fine lands on the Schedule, and from there the useful hop is *up* to the duty
@@ -129,13 +141,16 @@ def load():
     return index, graph, vocab
 
 
-def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int) -> tuple[list, dict]:
+def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int,
+            parent_doc: bool = False, hybrid: bool = None) -> tuple[list, dict]:
     expanded, hits, intents = expand_query(query, vocab)
     bm25 = BM25Okapi([tokenize(d) for d in index["docs"]])
     scores = bm25.get_scores(tokenize(expanded))
 
     # Intent hints nudge whole kinds or chapters up — "how much is the fine"
     # should reach the Schedule even though it shares few words with it.
+    # Applied to the BM25 score array before EITHER ranking path runs, so a
+    # boosted chunk is favoured consistently whether or not hybrid is on.
     boost_kinds, boost_chapters = set(), set()
     for name in intents:
         cfg = vocab["intents"][name]
@@ -146,9 +161,54 @@ def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int) -> tuple
         if c["kind"] in boost_kinds or c["chapter"] in boost_chapters:
             scores[i] *= 1.6
 
-    ranked = sorted(range(len(scores)), key=lambda i: -scores[i])
-    seeds = [index["chunks"][i] | {"score": round(float(scores[i]), 3), "hop": 0}
-             for i in ranked[:k] if scores[i] > 0]
+    if hybrid is None:
+        hybrid = HYBRID_DEFAULT
+
+    fused_scores = None
+    if hybrid:
+        import hybrid as hy  # local import: torch/transformers only paid for if used
+        bm25_ranked = sorted(range(len(scores)), key=lambda i: -scores[i])
+        embeddings = hy.chunk_embeddings(tuple(index["docs"]))
+        dense_ranked = hy.dense_ranks(expanded, embeddings)
+        fused_scores = hy.rrf_fuse(bm25_ranked, dense_ranked)
+        pool = sorted(fused_scores, key=lambda i: -fused_scores[i])[:hy.RERANK_POOL]
+        # The cross-encoder reads natural language, not the vocab-expanded
+        # query — expansion is a BM25 trick (extra tokens to match against);
+        # a cross-encoder needs the actual question, not statutory synonyms
+        # bolted on, to judge relevance the way it was trained to.
+        #
+        # Candidate TEXT is index["docs"][i] — the full BM25 document
+        # (verbatim + plain-English gloss + generated layperson questions),
+        # not just the bare verbatim text. Tried narrowing this to
+        # header+verbatim on the theory that a cross-encoder trained on short
+        # passages would truncate the long full-doc text and lose the
+        # relevant part. Measured, not assumed: it made the eval score WORSE
+        # (85/101 vs 92/101) — the plain-English/questions layer is exactly
+        # the vocabulary bridge FLOW.md's Stage 5 documents as necessary
+        # ("can I text customers?" shares no words with "processing... for a
+        # specified purpose"), and the cross-encoder needs that bridge just
+        # as much as BM25 does. Keep the full doc; don't re-narrow this
+        # without re-running the comparison in score_eval-style.
+        candidates = [(i, index["docs"][i]) for i in pool]
+        ranked = hy.rerank(query, candidates)
+        # Anything the fused shortlist missed still gets a fallback position,
+        # so `ranked` always covers every scored document like the BM25-only
+        # path does — a request for k beyond RERANK_POOL should degrade
+        # gracefully, not silently truncate.
+        ranked += [i for i in bm25_ranked if i not in set(ranked)]
+    else:
+        ranked = sorted(range(len(scores)), key=lambda i: -scores[i])
+
+    def seed_score(i: int) -> float:
+        # In hybrid mode a chunk can rank highly on dense similarity alone
+        # with a zero BM25 score (the exact miss-case this phase exists to
+        # fix) — reporting the raw BM25 score would make a real hybrid hit
+        # look like a zero-relevance result. The RRF score is what actually
+        # decided the ranking, so it is what gets reported.
+        return fused_scores[i] if fused_scores is not None else scores[i]
+
+    seeds = [index["chunks"][i] | {"score": round(float(seed_score(i)), 4), "hop": 0, "weight": 1.0}
+             for i in ranked[:k] if seed_score(i) > 0]
 
     # The Schedule is seven rows. When someone asks about a penalty, ranking
     # them against each other is the wrong problem — the honest answer is the
@@ -162,19 +222,20 @@ def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int) -> tuple
         chosen = {s["id"] for s in seeds}
         for i, chunk in enumerate(index["chunks"]):
             if chunk["kind"] == "Penalty" and chunk["id"] not in chosen:
-                seeds.append(chunk | {"score": round(float(scores[i]), 3), "hop": 0})
+                # seed_score(), not the raw BM25 array directly — this path
+                # bypassing it was a real bug: seeds picked by the normal
+                # ranking report a fused RRF score in hybrid mode (~0.01-0.03)
+                # while these forcibly-added rows reported raw BM25 magnitude
+                # (~40-90), so a single result list mixed two incomparable
+                # scales depending on which code path added each seed.
+                seeds.append(chunk | {"score": round(float(seed_score(i)), 4), "hop": 0, "weight": 1.0})
 
     # --- graph expansion --------------------------------------------------- #
     by_node = {c["node_id"]: c for c in index["chunks"]}
     parent = {n["id"]: None for n in graph["nodes"]}
-    adj: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for e in graph["links"]:
         if e["type"].startswith("HAS_"):
             parent[e["target"]] = e["source"]
-        if e["type"] in EXPAND_PRIORITY:
-            adj[e["source"]].append((e["target"], e["type"]))
-        if e["type"] in REVERSIBLE:
-            adj[e["target"]].append((e["source"], REVERSIBLE[e["type"]]))
 
     def chunk_for(node_id: str):
         """Walk up to the nearest provision that is itself a chunk — a citation
@@ -187,21 +248,79 @@ def retrieve(index: dict, graph: dict, vocab: dict, query: str, k: int) -> tuple
             node_id = parent.get(node_id)
         return None
 
+    if parent_doc:
+        # Parent-document retrieval: BM25 still searches at sub-section
+        # precision (a whole-section chunk would drown out the one duty the
+        # question is actually about), but the model reads the WHOLE section
+        # that precise hit lives in — so it sees surrounding sub-sections a
+        # narrower chunk would have cut off, without losing the precision
+        # that found the right seed in the first place.
+        promoted = {}
+        for s in seeds:
+            if s["kind"] != "SubSection":
+                promoted[s["id"]] = s
+                continue
+            section = chunk_for(parent.get(s["node_id"]))
+            if section is None:
+                promoted[s["id"]] = s
+                continue
+            # A sub-section's own score is what actually matched the query;
+            # keep the best one seen if two sub-sections share a parent.
+            existing = promoted.get(section["id"])
+            promoted[section["id"]] = section | {
+                "score": max(s["score"], existing["score"]) if existing and "score" in existing else s["score"],
+                "hop": 0, "weight": 1.0}
+        seeds = sorted(promoted.values(), key=lambda c: -c["score"])
+
+    # Rolled up to the nearest CHUNKED ancestor of the edge's source, not the
+    # raw source. A short section like §33 is indexed as one whole-section
+    # chunk (id "s-33"), but its REFERENCES/MENTIONS edges are recorded on
+    # child nodes ("s-33-1", "s-33-2-d", ...) that are never themselves a
+    # chunk's node_id. Without this rollup, `adj["s-33"]` would be empty and
+    # expansion could never leave §33 at all — only long sections (which get
+    # their own sub-section chunks) would ever expand. Same fix on both sides
+    # of an edge as `chunk_for` already does for expansion *targets*.
+    adj: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for e in graph["links"]:
+        if e["type"] in EXPAND_PRIORITY:
+            source_chunk = chunk_for(e["source"])
+            if source_chunk:
+                adj[source_chunk["node_id"]].append((e["target"], e["type"]))
+        if e["type"] in REVERSIBLE:
+            target_chunk = chunk_for(e["target"])
+            if target_chunk:
+                adj[target_chunk["node_id"]].append((e["source"], REVERSIBLE[e["type"]]))
+
     picked = {c["id"]: c for c in seeds}
-    candidates = []
-    for rank, seed in enumerate(seeds):
-        for target, etype in adj.get(seed["node_id"], []):
-            neighbour = chunk_for(target)
-            if neighbour and neighbour["id"] not in picked:
-                candidates.append((EXPAND_PRIORITY[etype], rank, neighbour, seed, etype))
+    frontier = seeds
+    for hop in range(1, MAX_HOPS + 1):
+        candidates = []
+        for rank, node in enumerate(frontier):
+            for target, etype in adj.get(node["node_id"], []):
+                # MENTIONS is exhaustive by construction (605 edges) — fine as
+                # a last-resort hop-1 neighbour, but at hop 2 it would pull in
+                # a large fraction of the Act through terms merely mentioned
+                # two edges away, which is noise, not a compound question.
+                if hop == MAX_HOPS and etype == "MENTIONS":
+                    continue
+                neighbour = chunk_for(target)
+                if neighbour and neighbour["id"] not in picked:
+                    candidates.append((EXPAND_PRIORITY[etype], rank, neighbour, node, etype))
 
-    for _prio, _rank, neighbour, seed, etype in sorted(candidates, key=lambda t: (t[0], t[1])):
-        if len(picked) - len(seeds) >= MAX_EXPANDED:
+        added = []
+        for prio, rank, neighbour, node, etype in sorted(candidates, key=lambda t: (t[0], t[1])):
+            if len(picked) - len(seeds) >= MAX_EXPANDED:
+                break
+            weight = node["weight"] * HOP_DECAY
+            entry = neighbour | {"score": 0.0, "hop": hop, "weight": weight,
+                                 "via": f"{node['label']} —{etype}→"}
+            picked.setdefault(neighbour["id"], entry)
+            added.append(entry)
+        frontier = added
+        if not frontier or len(picked) - len(seeds) >= MAX_EXPANDED:
             break
-        picked.setdefault(neighbour["id"], neighbour | {
-            "score": 0.0, "hop": 1, "via": f"{seed['label']} —{etype}→"})
 
-    results = sorted(picked.values(), key=lambda c: (c["hop"], -c["score"]))
+    results = sorted(picked.values(), key=lambda c: (c["hop"], -c["weight"], -c["score"]))
     return results, {"expanded": expanded, "vocab_hits": hits, "intents": intents}
 
 
@@ -251,13 +370,26 @@ def main() -> int:
     ap.add_argument("--retrieval-only", action="store_true",
                     help="show what was retrieved and why; call no model")
     ap.add_argument("--model", help="override DPDP_MODEL for this run")
+    ap.add_argument("--parent-doc", action="store_true",
+                    help="search at sub-section precision, but pass the whole "
+                         "containing section to the model")
+    ap.add_argument("--hybrid", action="store_true",
+                    help="dense embeddings + RRF fusion + cross-encoder rerank "
+                         "(overrides DPDP_HYBRID for this run)")
+    ap.add_argument("--provider", choices=["ollama", "claude"],
+                    help="override DPDP_PROVIDER for this run")
     args = ap.parse_args()
+    if args.provider:
+        llm.PROVIDER = args.provider
+        if not args.model:
+            llm.MODEL = llm._DEFAULT_MODEL[args.provider]
     if args.model:
         llm.MODEL = args.model
     question = " ".join(args.question)
 
     index, graph, vocab = load()
-    results, trace = retrieve(index, graph, vocab, question, args.k)
+    results, trace = retrieve(index, graph, vocab, question, args.k, parent_doc=args.parent_doc,
+                              hybrid=(True if args.hybrid else None))
 
     if not results:
         print("nothing retrieved — the question may be outside this Act.")
@@ -269,7 +401,8 @@ def main() -> int:
     if trace["intents"]:
         print(f"intent    : {', '.join(trace['intents'])}")
     print(f"retrieved : {sum(1 for r in results if r['hop'] == 0)} seeds "
-          f"+ {sum(1 for r in results if r['hop'] == 1)} via graph")
+          f"+ {sum(1 for r in results if r['hop'] > 0)} via graph "
+          f"(max hop {max((r['hop'] for r in results), default=0)})")
     for r in results:
         via = f"   ← {r['via']}" if r.get("via") else f"   (bm25 {r['score']})"
         print(f"   [{r['hop']}] {r['label']}{via}")

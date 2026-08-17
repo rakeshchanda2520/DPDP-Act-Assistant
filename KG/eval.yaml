@@ -14,7 +14,7 @@
 #          sub-section is a better answer, not a worse one.
 #   k:     seeds to consider (default 6)
 
-floor: 25          # fail the build below this many hits
+floor: 90          # fail the build below this many hits (101 cases, 11 known misses)
 
 cases:
   # --- penalties: the join a flat vector store cannot make -------------------
@@ -82,3 +82,204 @@ cases:
     want: s-33
     known_miss: true      # BM25 + vocab reach §29 (appeals) instead; needs
                           # either a vocab entry or dense retrieval
+
+  # ==========================================================================
+  # Grown from 26 to 101 cases (Phase 2 of TARGET.md). Every new case below
+  # was checked against real retrieval before being added — none of these are
+  # guessed expectations. `known_miss` cases are real, empirically-confirmed
+  # gaps, not padding: they are the concrete evidence for TARGET.md's hybrid-
+  # retrieval phase, and should start passing once that phase lands.
+  # ==========================================================================
+
+  # --- governance: the Board itself (previously zero coverage) --------------
+  - q: how is the Data Protection Board set up
+    want: s-18
+  - q: who can be appointed chairperson of the Board
+    want: s-19
+  - q: what salary do Board members get
+    want: s-20
+  - q: what disqualifies someone from being a Board member
+    want: s-21
+  - q: what happens if a Board member resigns
+    want: s-22
+  - q: how does the Board conduct its proceedings
+    want: s-23
+  - q: can the Board hire its own staff
+    want: s-24
+  - q: are Board members treated as public servants
+    want: s-25
+  - q: what powers does the chairperson of the Board have
+    want: s-26
+  - q: what are the Board's powers and functions
+    want: s-27
+  - q: what procedure must the Board follow when it investigates a complaint
+    want: s-28
+  - q: are officials protected if they acted in good faith
+    want: s-35
+  - q: can the government demand information from a company under this law
+    want: s-36
+  - q: can the central government give directions under this Act
+    want: s-37
+  - q: who makes the detailed rules under this Act
+    want: s-40
+    known_miss: true      # "rules" is generic across the Act; lands on
+                          # def-prescribed / s-43 instead of s-40
+  - q: do the rules made under this Act need to be presented to Parliament
+    want: s-41
+  - q: can the penalty amounts in the Schedule be changed later
+    want: s-42
+    known_miss: true      # Schedule/penalty vocabulary dominates; misses the
+                          # "amend" signal that distinguishes s-42
+  - q: what if there's a practical difficulty implementing this Act
+    want: s-43
+  - q: when did this Act come into force
+    want: s-1
+
+  # --- enforcement: appeals, tribunal, undertakings --------------------------
+  - q: can Board orders be enforced like a court decree
+    want: s-30
+  - q: is there a way to settle a dispute without going through the Board
+    want: s-31
+  - q: can a company avoid a penalty by voluntarily admitting the breach
+    want: s-32
+    known_miss: true      # the s-32 chunk shares little vocabulary with
+                          # "avoid a penalty"; lands on pen-6 instead
+  - q: where does the money from penalties go
+    want: s-34
+  - q: can we go to a civil court instead of the Board
+    want: s-39
+  - q: can we appeal if we disagree with a Board ruling
+    want: s-29
+
+  # --- scope --------------------------------------------------------------
+  - q: who exactly is covered by the scope of this Act
+    want: s-3
+  - q: does this Act override other laws
+    want: s-38
+  - q: does this Act change any other existing laws
+    want: s-44
+  - q: a tiny startup wants to know if these obligations apply to them at all
+    want: s-17
+  - q: our SaaS vendor's servers are in another country, is that allowed
+    want: s-16
+  - q: is data about a public figure that they posted themselves still covered
+    want: s-3
+
+  # --- obligations: paraphrase + coverage gaps --------------------------------
+  - q: what personal information can we collect without asking permission first
+    want: [s-4, s-5, s-6]
+  - q: what counts as a good enough reason to process data without consent
+    want: [s-4, s-7]
+    known_miss: true      # lands on definition chunks instead of s-4/s-7 —
+                          # "good enough reason" shares no statutory vocabulary
+  - q: what are the customer's own responsibilities under this law
+    want: s-15
+  - q: if a customer gives us false information can they be penalised
+    want: [s-15, pen-5]
+  - q: do we have to put a privacy policy on our signup page
+    want: s-5
+  - q: can we send promotional SMS to users who signed up for our app
+    want: s-6
+  - q: a teenager under 18 signed up for our platform, what extra checks apply
+    want: s-9
+  - q: we're a large fintech, what extra compliance do we owe beyond normal companies
+    want: s-10
+  - q: do we need a data protection officer for our startup
+    want: s-10
+  - q: how long are we allowed to keep a customer's KYC records after they close the account
+    want: s-8
+  - q: our cloud provider mishandles data, is our bank still on the hook
+    want: s-8
+
+  # --- rights: paraphrase + coverage gaps -------------------------------------
+  - q: a user wants a copy of everything we know about them
+    want: s-11
+    known_miss: true      # "copy of everything we know" shares no vocabulary
+                          # with s-11's "right to access information"
+  - q: customer says their address on file is outdated, can they force a fix
+    want: s-12
+  - q: a user wants their account permanently erased
+    want: s-12
+  - q: a customer passed away, who can access their account now
+    want: s-14
+  - q: we ignored a customer complaint, who do they escalate to
+    want: s-13
+
+  # --- penalties: paraphrase ---------------------------------------------------
+  - q: our vendor's system got hacked and phone numbers leaked, what's the fine
+    want: pen-1
+  - q: we forgot to tell the board about a ransomware incident, what happens
+    want: pen-2
+  - q: we showed ads targeted at kids without proper checks, what's the penalty
+    want: pen-3
+  - q: we're a big tech company and didn't appoint a DPO, what's the fine
+    want: pen-4
+  - q: a customer gave us fake KYC details, is that on them
+    want: [s-15, pen-5]
+
+  # --- definitions: coverage gaps + paraphrase --------------------------------
+  - q: what is a Consent Manager
+    want: def-consent-manager
+  - q: who counts as a Data Processor
+    want: def-data-processor
+  - q: what does the Data Protection Board actually mean as a term
+    want: def-board
+    known_miss: true      # "Board" appears in nearly every governance chunk,
+                          # so its own definition doesn't stand out by BM25 IDF
+  - q: who is the Appellate Tribunal
+    want: def-appellate-tribunal
+  - q: what does processing mean under this law
+    want: def-processing
+  - q: what is digital personal data specifically
+    want: def-digital-personal-data
+  - q: what counts as a specified purpose
+    want: def-specified-purpose
+  - q: what does the Act mean by consent manager's certain legitimate uses
+    want: def-certain-legitimate-uses
+  - q: what is a Chairperson under this Act
+    want: def-chairperson
+  - q: who is a Member of the Board
+    want: def-member
+  - q: what does the Act consider the State to be
+    want: def-state
+  - q: what does gain mean in the penalty context
+    want: def-gain
+    known_miss: true      # "gain" in a penalty context matches the penalty
+                          # chunks themselves, not the one-line definition
+  - q: what does loss mean under this Act
+    want: def-loss
+  - q: what exactly is personal data under this law
+    want: def-personal-data
+  - q: who counts as a Data Fiduciary
+    want: def-data-fiduciary
+  - q: up to what age is someone a child under this Act
+    want: def-child
+  - q: what is the legal definition of a personal data breach
+    want: def-personal-data-breach
+
+  # --- compound questions (stress test for the two-hop expansion phase) ------
+  # Satisfied by ANY one of the listed provisions today (one-hop, OR semantics
+  # — the same convention as every other multi-id `want` in this file). The
+  # real bar these set is for Phase 4 of TARGET.md: retrieving ALL of them for
+  # one question needs two-hop expansion, not one. Re-check these by hand
+  # after that phase lands instead of loosening the convention here.
+  - q: our data processor in another country lost a child's records, what do we owe and to whom
+    want: [s-9, s-16, pen-3]
+  - q: we're a significant data fiduciary and our security safeguards failed for children's data
+    want: [s-9, s-10, s-8, pen-1]
+  - q: what happens if we transfer data abroad without telling anyone and it leaks
+    want: [s-16, s-5, pen-1]
+
+  # --- deliberately hard: no shared vocabulary root, not in vocab.yaml -------
+  # These are TARGET.md's Phase 3 (hybrid retrieval) evidence, not bugs to
+  # patch with a country list — see FLOW.md's own note that a country list
+  # "is not a scalable fix". Keep them failing until dense retrieval lands.
+  - q: our processor's data centre sits in Singapore
+    want: s-16
+    known_miss: true
+  - q: we outsource storage to a facility in Germany
+    want: s-16
+    known_miss: true
+  - q: what if a company just refuses to comply with a Board directive
+    want: s-33
+    known_miss: true

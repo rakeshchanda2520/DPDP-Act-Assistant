@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A verbatim knowledge-graph RAG system for the Digital Personal Data Protection Act, 2023 (India), plus a FastAPI + SSE chatbot POC on top of it. Everything lives under `KG/`. Read `KG/FLOW.md` before touching the pipeline — it is the authoritative, numbers-grounded explanation of every stage (PDF extraction, graph construction, chunking, retrieval, why there are no embeddings). `KG/README.md` has the quickstart and file reference.
+A verbatim knowledge-graph RAG system for the Digital Personal Data Protection Act, 2023 (India), plus a FastAPI + SSE chatbot POC on top of it. Everything lives under `KG/`. Read `KG/FLOW.md` before touching the pipeline — it is the authoritative, numbers-grounded explanation of every stage (PDF extraction, graph construction, chunking, retrieval, why there are no embeddings by default). `KG/README.md` has the quickstart and file reference. `KG/TARGET.md` is the production-hardening roadmap and the source of truth for *why* the pluggable-provider, hybrid-retrieval, and audit-log machinery below exists — read it before changing any of them.
 
 ## Commands
 
@@ -13,7 +13,8 @@ All commands run from `KG/`.
 ```bash
 # One-time setup
 pip install pdfplumber networkx rank_bm25 pyyaml neo4j snowballstemmer fastapi uvicorn sse_starlette
-ollama pull qwen2.5:3b-instruct   # or qwen2.5:7b-instruct for materially better answers
+ollama pull qwen2.5:3b-instruct   # or qwen2.5:7b-instruct for materially better answers; see providers below
+pip install sentence-transformers torch   # optional, only for --hybrid / DPDP_HYBRID=1
 
 # Full rebuild (PDF -> graph -> search index)
 python build.py --neo4j     # PDF -> graph; --neo4j also loads into Neo4j (needs .env)
@@ -22,12 +23,18 @@ python index.py             # graph -> 142 BM25-searchable chunks (fast, no LLM)
 python index.py --plain     # also regenerates plain_language.json (~3h local CPU inference — see below)
 
 # Tests
-python test_build.py        # 15 checks: structural invariants + eval.yaml retrieval scoring
+python test_build.py        # 15 checks: structural invariants + eval.yaml retrieval scoring (101 cases)
 pytest test_build.py         # same, if you prefer the pytest runner
+python eval_answers.py      # answer-quality eval (answer_eval.yaml): quote-exactness, citation
+                             # resolution, rupee-figure accuracy, abstention — separate from
+                             # test_build.py because it costs a real generation call per case
 
 # CLI query (no server)
 python ask.py "what is the fine if customer data leaks?"
 python ask.py --retrieval-only "penalty for a data leak"   # skip the LLM call, just show what was retrieved
+python ask.py --parent-doc "..."   # search sub-section precision, answer from the whole section
+python ask.py --hybrid "our processor's data centre sits in Singapore"   # dense+BM25+rerank, opt-in
+python ask.py --provider claude --model claude-sonnet-5 "..."   # override DPDP_PROVIDER for one run
 
 # Web app
 uvicorn api:app --port 8000 --reload    # http://127.0.0.1:8000
@@ -40,8 +47,12 @@ There is no single-test flag — `test_build.py` is a flat script of `test_*` fu
 - **`.env`** (gitignored, copy from `.env.example`) holds Neo4j credentials and Ollama config (`NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`, `OLLAMA_HOST`, `DPDP_MODEL`). `build.py` loads it itself via a 6-line stdlib parser — no `python-dotenv` dependency.
 - **Neo4j Aura quirk**: some Aura instances reject the usual `neo4j`/`neo4j` user+database pair and require both set to the instance ID instead. Check which pair your instance accepts before assuming a connection failure is a bug.
 - **`plain_language.json`** lives at the repo root (`KG/`), not under `out/`. It costs ~3h of local CPU inference to regenerate and is deliberately excluded from `.gitignore` (unlike everything else in `out/` and `review/`, which are disposable and rebuilt in seconds). Never `rm -rf out` expecting it to be safe — it isn't in `out/` precisely because of a past incident where it was.
-- **Ollama must be running** (`ollama serve`) for `index.py --plain`, `ask.py` (non-`--retrieval-only`), and the web app's `/api/chat` to produce answers. Retrieval-only paths (`build.py`, `index.py` without `--plain`, `ask.py --retrieval-only`, `test_build.py`) never call Ollama.
-- **A 3B model is the current default** (`DPDP_MODEL=qwen2.5:3b-instruct`) and is the known weak link — it has misread Schedule penalty figures and glossed over legal nuance (e.g. conflating "family" with "nominated person" under §14). Retrieval is not the bottleneck; the model is. Prefer `qwen2.5:7b-instruct` for anything beyond a quick smoke test.
+- **`logs/`** (gitignored) holds `audit_log.jsonl`, the FastAPI backend's append-only per-request record (question, retrieval trace, full answer, citation resolution, timings, `build_id`). Also outside `out/` for the same reason `plain_language.json` is — it must survive a rebuild.
+- **`llm.py` is a pluggable provider** (`OllamaProvider` / `ClaudeProvider`), selected by `DPDP_PROVIDER` (default `ollama`, no key needed). Every caller (`ask.py`, `api.py`, `index.py`) goes through the same five module functions (`chat`, `chat_stream`, `check`, `models`, `warn_if_small`) regardless of provider — never call the Ollama HTTP API or the `anthropic` SDK directly from anywhere else.
+- **Ollama must be running** (`ollama serve`) for `index.py --plain` and any non-`--retrieval-only` answer path when `DPDP_PROVIDER=ollama`. With `DPDP_PROVIDER=claude`, `ANTHROPIC_API_KEY` must be set instead — no local server needed. Retrieval-only paths (`build.py`, `index.py` without `--plain`, `ask.py --retrieval-only`, `test_build.py`) never call any provider.
+- **A 3B local model is the current default** (`DPDP_MODEL=qwen2.5:3b-instruct`) and is the known weak link — it has misread Schedule penalty figures and glossed over legal nuance (e.g. conflating "family" with "nominated person" under §14). Retrieval is not the bottleneck; the model is. `answer_eval.yaml` has permanent regression cases for both errors. Prefer `DPDP_PROVIDER=claude` or `qwen2.5:7b-instruct` for anything beyond a quick smoke test.
+- **Hybrid retrieval (`hybrid.py`) is off by default** (`DPDP_HYBRID=1` or `ask.py --hybrid` to enable). Needs `sentence-transformers` + `torch` and two locally-cached HF models (`sentence-transformers/all-MiniLM-L6-v2`, `cross-encoder/ms-marco-MiniLM-L-6-v2`) — `hybrid.py` forces `HF_HUB_OFFLINE=1` by default so a slow/absent network doesn't stall every startup; set `DPDP_HF_ONLINE=1` the first time a model isn't cached yet. Measured, not assumed better: 92/101 on `eval.yaml` vs BM25-only's 90/101, cutting `known_miss` cases from 11 to 5, but with its own new misses on a few previously-easy exact-match questions — see the comparison methodology and the code comments in `ask.py`'s `retrieve()` before changing the reranker's candidate text; a plausible-looking "improvement" there was measured to make things *worse* (85/101) and was reverted.
+- **The abstention gate in `api.py`** (`should_abstain`, threshold `ABSTAIN_THRESHOLD`) is a first-line filter, not a complete out-of-domain classifier — it catches clearly unrelated questions but not adjacent-domain ones (GDPR/HIPAA-style questions score as high as genuine DPDP questions on BM25 because they share real legal vocabulary). This is documented, not hidden, in the code comment next to the threshold.
 
 ## Architecture
 
@@ -52,9 +63,14 @@ build.py  → out/dpdp_tree.json, out/dpdp_graph.json, out/schedule.json,
             out/dpdp.gexf, out/graph.html, out/load.cypher, review/*.md
             (+ optionally pushes to Neo4j via --neo4j)
 index.py  → out/index.json (142 BM25 chunks); --plain also writes plain_language.json
-llm.py    → thin stdlib HTTP client for Ollama (chat + chat_stream + structured JSON output)
-ask.py    → CLI: question -> vocab.yaml expansion -> BM25 -> graph expansion -> cited answer
-api.py    → FastAPI: same retrieval as ask.py, streamed over SSE, plus citation verification
+llm.py    → pluggable provider (Ollama default / Claude) — chat, chat_stream, check, models
+hybrid.py → optional dense retrieval: embeddings + RRF fusion + cross-encoder rerank
+ask.py    → CLI: question -> vocab.yaml expansion -> BM25(+hybrid) -> 2-hop graph
+            expansion -> cited answer
+api.py    → FastAPI: same retrieval as ask.py, streamed over SSE, plus citation
+            verification, abstention gate, and audit_log.jsonl
+eval_answers.py → answer-quality eval (answer_eval.yaml): quote-exactness, citation
+            resolution, rupee-figure accuracy, abstention — deterministic, no judge model
 web/index.html → single-file chat UI, no build step, consumes the SSE stream
 ```
 
@@ -71,13 +87,17 @@ The Gazette PDF has three columns per page (marginalia-left, body, marginalia-ri
 
 Nodes: Act → Chapter → Section → SubSection/Clause/SubClause → Illustration, plus `Definition` nodes (28, one per defined term in §2) and `Penalty` nodes (7, one per Schedule row). Edges include structural containment, `DEFINES`, `MENTIONS` (any provision referencing a defined term), `REFERENCES` (cross-references between sections, resolved via regex + the "bare reference means current section" convention), and `PENALISED_BY` (the join between an obligation and its Schedule penalty — the single edge type that makes the graph worth having, since no embedding-based retrieval can infer that §8(5)'s security-safeguards duty maps to Schedule entry 1's ₹250-crore penalty from text similarity alone).
 
-### Retrieval — no embeddings, by design
+### Retrieval — BM25 by default, hybrid opt-in
 
-Retrieval is BM25 (`rank_bm25`) over the 142 chunks, not a vector store. `FLOW.md` has the full rationale; the short version: the corpus is small (142 chunks), exact statutory terms (section numbers, defined terms, rupee figures) matter more than semantic similarity for this domain, and the vocabulary gap between layperson questions and statutory language is closed by two cheaper, more auditable mechanisms instead:
+Retrieval is BM25 (`rank_bm25`) over the 142 chunks by default, not a vector store. `FLOW.md` has the full rationale; the short version: the corpus is small (142 chunks), exact statutory terms (section numbers, defined terms, rupee figures) matter more than semantic similarity for this domain, and the vocabulary gap between layperson questions and statutory language is closed by two cheaper, more auditable mechanisms instead:
 - `vocab.yaml` — a hand-maintained synonym map (e.g. "leak" → "personal data breach") applied before BM25 scoring.
 - `plain_language.json` — LLM-generated plain-English questions per chunk (indexed, never cited), so a layperson's phrasing has something to match against even when it shares no vocabulary with the statute.
 
-After BM25 retrieval, `ask.retrieve()` performs one hop of graph expansion from the top hits (following `REFERENCES`, `PENALISED_BY`, `DEFINES`) to pull in provisions the keyword match alone would miss — this is the "Graph" part of GraphRAG. `eval.yaml` (26 hand-written question/expected-provision pairs) is the regression harness for retrieval quality; `test_build.py` fails the build if retrieval accuracy drops below its floor.
+`hybrid.py` (opt-in, `DPDP_HYBRID=1` or `ask.py --hybrid`) adds dense embeddings fused with BM25 via Reciprocal Rank Fusion, then reranks the fused shortlist with a cross-encoder — implemented per FLOW.md's own specified upgrade path, and gated on the eval set rather than shipped by default. Never dense-only: BM25 stays in the fusion because dense retrieval alone regresses badly on exact section numbers and rupee figures.
+
+After retrieval, `ask.retrieve()` performs **up to two hops** of graph expansion from the top hits (following `REFERENCES`, `PENALISED_BY`, `DEFINES`, `MENTIONS`), with each hop's contribution decayed (`HOP_DECAY`) so distant provisions are still reachable without flooding the context — this is the "Graph" part of GraphRAG. Expansion edges are rolled up to the nearest *chunked* ancestor on both sides (`chunk_for`) — this matters because a short section's `REFERENCES`/`MENTIONS` edges live on its un-chunked children, not the section chunk itself; without the rollup, expansion could never leave a short section at all. `retrieve(..., parent_doc=True)` searches at sub-section precision but promotes each hit to its containing section for generation — better precision at retrieval time, fuller context at generation time.
+
+`eval.yaml` (101 question/expected-provision pairs, grown from an original 26 — every case checked against real retrieval before being added, `known_miss` cases are confirmed real gaps, not guesses) is the regression harness for retrieval quality; `test_build.py` fails the build if retrieval accuracy drops below its floor. `answer_eval.yaml` + `eval_answers.py` is the companion harness one layer downstream — it proves the model *used* what was retrieved correctly (verbatim quotes, resolved citations, correct rupee figures, honest abstention), which `eval.yaml` cannot check since it only scores retrieval.
 
 ### Citation verification (`api.py`)
 
@@ -85,4 +105,8 @@ The FastAPI backend's most important behavior: after the LLM streams an answer, 
 
 ### SSE streaming shape
 
-`POST /api/chat` streams four event types in order: `retrieval` (which chunks/graph nodes were pulled in, before generation starts — lets the UI show progress immediately since the LLM hasn't started yet), `token` (incremental answer text), `citations` (the verification result described above, sent after the full answer is available), `done`. `web/index.html` is a single static file with no build tooling — edit it directly, no bundler/transpile step involved.
+`POST /api/chat` streams event types in order: `retrieval` (which chunks/graph nodes were pulled in, before generation starts — lets the UI show progress immediately since the LLM hasn't started yet, now also carrying `build_id`), then either `abstain` (retrieval was too weak to answer from — see `should_abstain`, a deterministic BM25-score gate — or the request ends here with no generation call made) or `token`×N (incremental answer text), `citations` (the verification result described above, sent after the full answer is available), `done`. `web/index.html` is a single static file with no build tooling — edit it directly, no bundler/transpile step involved.
+
+### Audit trail and versioning
+
+Every request writes one line to `logs/audit_log.jsonl` (`api.audit_log`) — question, retrieval trace, full answer, per-citation resolution status, timings, model/provider, and `build_id`. `build_id` (`api.compute_build_id`) is a content hash of the graph, not a version number anyone has to remember to bump — it changes automatically the moment the Act (or, later, the Rules) is amended and rebuilt, so a logged or displayed answer's `build_id` tells you exactly which text it was generated against.

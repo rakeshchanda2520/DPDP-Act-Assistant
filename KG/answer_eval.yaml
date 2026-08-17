@@ -1,0 +1,125 @@
+# Answer-quality eval set.
+#
+# eval.yaml proves the right provision was RETRIEVED. This file proves the
+# model then used it correctly — retrieval finding s-14 doesn't stop the model
+# from saying "family can step in" when the text says "nominate ... any other
+# individual". That error passed every check in eval.yaml and reached a user.
+#
+# Every check here is deterministic — string and graph comparisons, no judge
+# model, no extra API cost beyond the one answer call per case:
+#
+#     - every quoted span is character-exact against the cited provision
+#     - every citation resolves `verified` (this Act, and it was retrieved)
+#     - every rupee figure matches the graph's Penalty node exactly
+#     - `cites_any` — at least one of the listed provisions was cited
+#     - `must_say` / `must_not_say` — case-insensitive substring checks; blunt,
+#       but the historical "family can" bug (s-14) and the "two hundred crore"
+#       bug (should be two hundred and fifty) are both exactly this shape of
+#       error, so a substring check catches the failures that actually happened
+#     - `abstain: true` cases produce no citations and no rupee figures
+#
+# Grow this whenever a real answer is flagged wrong — same discipline as
+# eval.yaml, just one layer downstream. A free-form substance judge (an LLM
+# grading the answer against a reference) is the natural next tier, deferred
+# until this deterministic layer stops finding new bugs on its own.
+
+cases:
+  # --- the two documented real errors, as permanent regression cases --------
+  - q: someone died, can their family get their account information?
+    must_say: ["nominat"]
+    must_not_say: ["family can", "family member can access", "next of kin can access"]
+    note: "regression case — a 3B model once answered 'family can step in'; the
+           Act says only a NOMINATED individual (s-14), not family generally"
+
+  - q: what is the fine if customer data leaks because of weak security?
+    penalty_entries: [1]
+    note: "regression case — a 3B model once said 'two hundred crore'; the
+           correct figure for entry 1 is two hundred and fifty crore rupees"
+
+  # --- one case per Schedule entry: the ₹200cr-for-₹250cr error class -------
+  - q: penalty for not telling the regulator about a hack
+    penalty_entries: [2]
+  - q: how much can we be fined for mishandling children's data?
+    penalty_entries: [3]
+  - q: what's the penalty if a significant data fiduciary skips its extra duties?
+    penalty_entries: [4]
+  - q: is there a penalty for the customer themselves doing something wrong?
+    penalty_entries: [5]
+  - q: what happens if a company breaks its voluntary undertaking to the Board?
+    penalty_entries: [6]
+  - q: what's the catch-all penalty for breaking a rule with no specific fine listed?
+    penalty_entries: [7]
+
+  # --- ordinary answerable questions: quote-exactness + citation checks -----
+  - q: can I text my customers marketing offers?
+    cites_any: [s-6]
+  - q: a kid signed up on our app, what extra rules apply?
+    cites_any: [s-9]
+  - q: how do I get a company to delete my data?
+    cites_any: [s-12]
+  - q: we are a tiny startup, do all these rules really apply to us?
+    cites_any: [s-17, s-17-3]
+  - q: can we keep data on servers outside india?
+    cites_any: [s-16]
+  - q: who is a data fiduciary?
+    cites_any: [def-data-fiduciary]
+  - q: what counts as personal data?
+    cites_any: [def-personal-data]
+  - q: at what age is someone still a child under this law?
+    cites_any: [def-child]
+  - q: do we need to tell customers what we are collecting and why?
+    cites_any: [s-5]
+  - q: our vendor handles the data, are we still responsible?
+    cites_any: [s-8]
+  - q: the company is ignoring me, who do I complain to?
+    cites_any: [s-13]
+  - q: can we appeal a decision we disagree with?
+    cites_any: [s-29]
+  - q: do we have to appoint a data protection officer?
+    cites_any: [s-10]
+  - q: my address is wrong on their records, can I make them fix it?
+    cites_any: [s-12]
+  - q: what exactly counts as a data breach?
+    cites_any: [def-personal-data-breach]
+  - q: what are the customer's own responsibilities under this law?
+    cites_any: [s-15]
+  - q: how does the Board conduct its proceedings?
+    cites_any: [s-28]
+  - q: can Board orders be enforced like a court decree?
+    cites_any: [s-30]
+
+  # --- must NOT invent a citation or a rupee figure --------------------------
+  - q: what's the penalty for a first-time minor paperwork mistake with no harm done?
+    note: "the Act does not grade penalties by intent or harm; a good answer
+           says the Schedule doesn't carve out a lesser tier, not invent one"
+    must_not_say: ["first offense", "first-time", "warning only"]
+
+  # --- abstention: questions this Act does not answer -----------------------
+  - q: what is the penalty for a data breach under GDPR?
+    abstain: true
+  - q: how do I file my income tax return?
+    abstain: true
+  - q: can I sue my landlord for keeping my security deposit?
+    abstain: true
+  - q: what does HIPAA require for medical records in the US?
+    abstain: true
+  - q: is cryptocurrency legal in India?
+    abstain: true
+  - q: what's the RBI's KYC re-verification cycle for a savings account?
+    abstain: true
+    note: "adjacent-domain trap — RBI KYC rules are not in this Act; a good
+           answer says so rather than answering from banking-regulation priors"
+
+  # --- judge-graded substance (only with --judge; needs must_say material) --
+  - q: our vendor handles the data, are we still responsible?
+    cites_any: [s-8]
+    must_say: ["still", "responsible", "Fiduciary"]
+    must_not_say: ["vendor is fully responsible", "not our responsibility"]
+    note: "s-8's whole point is non-delegable responsibility; a wrong answer
+           says the vendor takes the liability instead"
+
+  - q: we're a tiny startup, do these rules apply to us?
+    must_say: ["exemption", "Central Government"]
+    must_not_say: ["automatically exempt", "startups are exempt"]
+    note: "s-17(3) requires a Central Government notification naming the
+           exempted class; a wrong answer treats small size as automatic exemption"

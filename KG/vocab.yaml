@@ -189,6 +189,8 @@ terms:
   # The Data Principal has duties too, and breaching them carries its own
   # (much smaller) penalty — easy to miss among six Data Fiduciary entries.
   duty: [duties, Duties of Data Principal]
+  responsibilities: [duties, Duties of Data Principal]
+  responsibility: [duties, Duties of Data Principal]
   my fault: [duties, Duties of Data Principal]
   customer at fault: [duties, Duties of Data Principal]
   false complaint: [duties, Duties of Data Principal]

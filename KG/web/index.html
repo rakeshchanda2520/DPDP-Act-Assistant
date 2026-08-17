@@ -105,6 +105,8 @@
   .meta{margin-top:12px;font:var(--t3) var(--mono);color:var(--faint)}
   .err{background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.3);
        color:#fca5a5;border-radius:10px;padding:12px 14px;white-space:pre-wrap}
+  .abstain{background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.3);
+       color:#fcd34d;border-radius:10px;padding:12px 14px;white-space:pre-wrap}
 
   footer{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(
          transparent,var(--bg) 22%);padding:22px 20px 18px}
@@ -345,6 +347,9 @@ async function ask() {
           wrap.appendChild(m);
         } else if (ev === 'error') {
           body.className = 'err';
+          body.textContent = d.message;
+        } else if (ev === 'abstain') {
+          body.className = 'abstain';
           body.textContent = d.message;
         }
       }

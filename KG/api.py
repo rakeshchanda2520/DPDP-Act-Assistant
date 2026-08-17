@@ -27,10 +27,13 @@ Run:  uvicorn api:app --reload --port 8000
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
+import os
 import re
 import sys
 import time
+import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -43,6 +46,10 @@ import llm
 
 ROOT = Path(__file__).parent
 WEB = ROOT / "web"
+# Deliberately OUTSIDE out/: that directory is disposable and gets wiped on a
+# clean rebuild, and an audit trail must survive that — same reasoning as
+# plain_language.json living at the repo root instead of under out/.
+LOGS = ROOT / "logs"
 
 # "§8(5)", "§ 8 (5)(a)", "section 8(5)", "Schedule entry 2", "Schedule 2".
 RE_CITATION = re.compile(
@@ -50,9 +57,35 @@ RE_CITATION = re.compile(
     r"|\bSchedule\s+(?:entry\s+)?(\d)\b", re.IGNORECASE)
 RE_PART = re.compile(r"\(\s*([0-9a-zA-Z]{1,3})\s*\)")
 
+# Below this BM25 score, retrieval found essentially nothing — a genuinely
+# unrelated question ("how do I bake a chocolate cake?") scores 7-12 here.
+#
+# Calibrated against 8 out-of-scope probes and 6 real DPDP questions (see
+# eval_answers.py / answer_eval.yaml's `abstain: true` cases). Honest result:
+# this threshold only catches the CLEARLY unrelated end — income tax filing
+# (10.6), "capital of France" (11.9), cryptocurrency legality (7.8). It does
+# NOT catch adjacent-domain questions that share real legal vocabulary with
+# the Act: "GDPR penalty" scored 80.9, "HIPAA" 33.8, "RBI KYC cycle" 24.5 —
+# all inside or above the range of genuine in-scope questions (22.7-85.2).
+# That gap is real and is exactly the failure mode TARGET.md's hybrid-
+# retrieval phase is meant to close with an actual out-of-domain signal, not
+# a lexical score. Keep this threshold low and treat it as a first-line
+# filter for the obvious cases, not a complete classifier.
+ABSTAIN_THRESHOLD = 15.0
+
 app = FastAPI(title="DPDP Act 2023 assistant", version="1.0")
 
 STATE: dict = {}
+
+
+def compute_build_id(graph: dict) -> str:
+    """A content hash of the graph, not a version number someone has to
+    remember to bump. Stamped on every response and every audit record, so
+    "which answers are now stale?" is answerable the moment the Act (or the
+    Rules, later) is amended and the graph is rebuilt — the hash changes,
+    and every record before it is visibly from the old text."""
+    payload = json.dumps(graph, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()[:12]
 
 
 @app.on_event("startup")
@@ -60,18 +93,47 @@ def startup() -> None:
     """Load the index once. BM25 is rebuilt per query (142 docs, milliseconds),
     but the JSON parsing is not free and does not belong in the request path."""
     index, graph, vocab = ask.load()
+    LOGS.mkdir(exist_ok=True)
     STATE.update(
         index=index, graph=graph, vocab=vocab,
         tree=json.loads((ROOT / "out" / "dpdp_tree.json").read_text(encoding="utf-8")),
         nodes={n["id"]: n for n in graph["nodes"]},
+        build_id=compute_build_id(graph),
     )
     print(f"loaded {len(index['chunks'])} chunks, {len(graph['nodes'])} nodes; "
-          f"model {llm.MODEL}")
+          f"model {llm.MODEL}; build {STATE['build_id']}")
+
+
+def should_abstain(results: list[dict]) -> str | None:
+    """Return a reason to abstain, or None to proceed to generation.
+
+    The only prior line of defence against an out-of-scope question was the
+    model's own judgement — and the whole reason this project distrusts a
+    small model's judgement on in-scope questions is exactly why it should
+    not be trusted alone on the harder question of "should I answer at all".
+    A BM25 score threshold is deterministic, auditable, and tunable against
+    eval data the same way every other retrieval decision in this system is.
+    """
+    top = max((r["score"] for r in results if r["hop"] == 0), default=0.0)
+    if top < ABSTAIN_THRESHOLD:
+        return (f"the closest match scored {top:.1f}, well below what a real "
+                f"provision of this Act scores for an in-scope question")
+    return None
+
+
+def audit_log(record: dict) -> None:
+    """One line per request. Append-only, never rewritten — an audit trail
+    that could be silently edited after the fact is not an audit trail."""
+    line = json.dumps(record, ensure_ascii=False)
+    with open(LOGS / "audit_log.jsonl", "a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
 
 class Question(BaseModel):
     question: str = Field(min_length=2, max_length=800)
     k: int = Field(default=6, ge=1, le=15)
+    parent_doc: bool = False
+    hybrid: bool | None = None  # None = defer to DPDP_HYBRID env var
 
 
 # --------------------------------------------------------------------------- #
@@ -155,10 +217,12 @@ def penalty_facts(results: list[dict]) -> list[dict]:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": llm.check() is None, "model": llm.MODEL,
-            "detail": llm.check() or "ready",
+    error = llm.check()
+    return {"ok": error is None, "model": llm.MODEL, "provider": llm.PROVIDER,
+            "detail": error or "ready",
             "chunks": len(STATE["index"]["chunks"]),
-            "nodes": len(STATE["graph"]["nodes"])}
+            "nodes": len(STATE["graph"]["nodes"]),
+            "build_id": STATE["build_id"]}
 
 
 @app.get("/api/provision/{node_id}")
@@ -176,13 +240,17 @@ def provision(node_id: str) -> dict:
 @app.post("/api/chat")
 async def chat(q: Question) -> EventSourceResponse:
     started = time.time()
+    request_id = uuid.uuid4().hex[:12]
 
     async def stream():
         # 1. Retrieve. Send it immediately — it is instant, and showing which
         #    provisions were found makes the wait legible instead of blank.
         results, trace = await asyncio.to_thread(
-            ask.retrieve, STATE["index"], STATE["graph"], STATE["vocab"], q.question, q.k)
+            ask.retrieve, STATE["index"], STATE["graph"], STATE["vocab"], q.question, q.k,
+            q.parent_doc, q.hybrid)
         if not results:
+            audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                      "build_id": STATE["build_id"], "outcome": "no_results"})
             yield {"event": "error",
                    "data": json.dumps({"message":
                                        "Nothing in this Act matches that question."})}
@@ -193,6 +261,7 @@ async def chat(q: Question) -> EventSourceResponse:
             "vocabulary": trace["vocab_hits"],
             "intents": trace["intents"],
             "elapsed_ms": int((time.time() - started) * 1000),
+            "build_id": STATE["build_id"],
             "provisions": [{
                 "id": r["node_id"], "label": r["label"], "kind": r["kind"],
                 "headnote": r.get("headnote", ""), "hop": r["hop"],
@@ -200,7 +269,25 @@ async def chat(q: Question) -> EventSourceResponse:
             } for r in results],
         })}
 
+        # 1a. Abstain before spending a generation call on a question this Act
+        # plainly does not cover — see should_abstain's docstring for why this
+        # is a threshold, not a judgement call left to the model.
+        if reason := should_abstain(results):
+            audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                      "build_id": STATE["build_id"], "outcome": "abstained", "reason": reason,
+                      "top_score": max((r["score"] for r in results if r["hop"] == 0), default=0.0)})
+            yield {"event": "abstain", "data": json.dumps({
+                "message": "This doesn't look like something the Digital Personal Data "
+                          "Protection Act, 2023 covers — the closest match in the Act "
+                          "was too weak to answer from. Try rephrasing, or this may be "
+                          "outside this Act's scope entirely.",
+                "reason": reason,
+            })}
+            return
+
         if error := llm.check():
+            audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                      "build_id": STATE["build_id"], "outcome": "llm_unavailable", "error": error})
             yield {"event": "error", "data": json.dumps({"message": error})}
             return
 
@@ -228,6 +315,9 @@ async def chat(q: Question) -> EventSourceResponse:
             if kind == "eof":
                 break
             if kind == "error":
+                audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                          "build_id": STATE["build_id"], "outcome": "generation_error",
+                          "error": payload})
                 yield {"event": "error", "data": json.dumps({"message": payload})}
                 return
             chunks.append(payload)
@@ -235,15 +325,34 @@ async def chat(q: Question) -> EventSourceResponse:
 
         # 3. Check what it cited, and hand back the amounts from the graph.
         answer = "".join(chunks)
+        citations = check_citations(answer, retrieved_ids)
+        elapsed_ms = int((time.time() - started) * 1000)
         yield {"event": "citations", "data": json.dumps({
-            "citations": check_citations(answer, retrieved_ids),
+            "citations": citations,
             "penalties": penalty_facts(results),
         })}
         yield {"event": "done", "data": json.dumps({
-            "elapsed_ms": int((time.time() - started) * 1000),
+            "elapsed_ms": elapsed_ms,
             "model": llm.MODEL,
+            "provider": llm.PROVIDER,
+            "build_id": STATE["build_id"],
             "context_chars": len(prompt),
         })}
+
+        # Everything needed to reconstruct and investigate this answer later:
+        # what was retrieved, what was sent to the model, what it said, and
+        # how each citation resolved. This is the record a "your tool told me
+        # X yesterday, was that right?" complaint gets investigated against.
+        audit_log({
+            "request_id": request_id, "ts": time.time(), "question": q.question,
+            "build_id": STATE["build_id"], "outcome": "answered",
+            "model": llm.MODEL, "provider": llm.PROVIDER,
+            "elapsed_ms": elapsed_ms, "context_chars": len(prompt),
+            "retrieved": [{"id": r["node_id"], "hop": r["hop"], "score": r["score"]}
+                         for r in results],
+            "answer": answer,
+            "citations": [{"id": c["id"], "status": c["status"]} for c in citations],
+        })
 
     return EventSourceResponse(stream())
 
