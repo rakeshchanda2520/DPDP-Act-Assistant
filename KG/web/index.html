@@ -4,150 +4,247 @@
 <title>DPDP Act 2023 — assistant</title>
 <style>
   :root{
-    --bg:#0b0f19; --panel:#111827; --panel2:#151d2e; --line:#1f2a3d;
-    --ink:#e6edf7; --dim:#8fa0bb; --faint:#64748b;
-    --accent:#5b9dff; --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+    /* Deliberately desaturated. The earlier palette used near-neon accents
+       that read as "dashboard"; a compliance tool people quote in writing
+       should read as "document". Same hues, pulled back. */
+    --bg:#0a0d14; --panel:#11151f; --panel2:#161b27; --raise:#1b2230;
+    --line:#222b3a; --line2:#2c374a;
+    --ink:#e8edf6; --dim:#94a3b8; --faint:#64748b;
+    --accent:#6b9fe8; --accent-dim:#3d5f8f;
+    --ok:#5bbd93; --warn:#d9a441; --bad:#df7d7d;
+
     --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-    /* Four steps, ~1.25 apart. Everything picks one of these — the earlier
+    /* The Act's own words get a serif. It is the cheapest possible signal
+       that quoted statute is a different KIND of thing from the model's
+       prose around it — the distinction this whole project is built on. */
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+
+    /* Four steps, ~1.25 apart. Everything picks one of these — an earlier
        draft drifted to nine sizes between 11 and 15px, which reads as noise
        rather than hierarchy. */
     --t1:19px;   /* headings */
     --t2:15px;   /* body and answers */
-    --t3:12px;   /* supporting detail, quotes, tables */
+    --t3:12.5px; /* supporting detail, quotes, tables */
     --t4:10px;   /* uppercase micro-labels and tags */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);
-       font:var(--t2)/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-  header{display:flex;align-items:center;gap:14px;padding:14px 20px;
-         background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
-  header h1{font-size:var(--t1);margin:0;font-weight:600;letter-spacing:-.2px}
-  header .sub{color:var(--faint);font-size:var(--t3)}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
-  .dot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(52,211,153,.15)}
-  .dot.off{background:var(--bad);box-shadow:0 0 0 3px rgba(248,113,113,.15)}
+       font:var(--t2)/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       -webkit-font-smoothing:antialiased}
 
-  main{max-width:1180px;margin:0 auto;padding:22px 20px 140px}
-  .msg{margin:0 0 26px}
-  .who{font-size:var(--t4);letter-spacing:.11em;text-transform:uppercase;
-       color:var(--faint);margin-bottom:7px}
+  header{display:flex;align-items:center;gap:13px;padding:15px 24px;
+         background:linear-gradient(var(--panel),var(--bg));
+         border-bottom:1px solid var(--line);flex-wrap:wrap}
+  header h1{font-size:var(--t1);margin:0;font-weight:600;letter-spacing:-.25px}
+  header .sub{color:var(--faint);font-size:var(--t3)}
+  header .rule{color:var(--line2)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex:none}
+  .dot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(91,189,147,.13)}
+  .dot.off{background:var(--bad);box-shadow:0 0 0 3px rgba(223,125,125,.13)}
+  .badge{font:var(--t4) var(--mono);letter-spacing:.06em;text-transform:uppercase;
+         color:var(--faint);border:1px solid var(--line);border-radius:4px;
+         padding:2px 7px}
+
+  main{max-width:1100px;margin:0 auto;padding:26px 24px 150px}
+  .msg{margin:0 0 30px}
+  .who{font-size:var(--t4);letter-spacing:.13em;text-transform:uppercase;
+       color:var(--faint);margin-bottom:8px}
   .you{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
-       padding:11px 15px;display:inline-block;max-width:80%}
+       padding:12px 16px;display:inline-block;max-width:80%}
 
   .answer{white-space:pre-wrap;background:var(--panel);border:1px solid var(--line);
-          border-radius:10px;padding:16px 18px}
-  .answer b{color:#fff}
-  .cursor{display:inline-block;width:7px;height:16px;background:var(--accent);
-          vertical-align:-2px;animation:blink 1s steps(2) infinite}
+          border-radius:12px;padding:18px 20px}
+  .answer b{color:#fff;font-weight:600}
+  .cursor{display:inline-block;width:2px;height:16px;background:var(--accent);
+          vertical-align:-3px;animation:blink 1.1s steps(2) infinite}
   @keyframes blink{50%{opacity:0}}
 
-  details.trace{margin:11px 0 0;background:var(--panel);border:1px solid var(--line);
-                border-radius:10px;overflow:hidden}
-  details.trace>summary{cursor:pointer;padding:10px 14px;font-size:var(--t3);
-                        color:var(--dim);user-select:none;list-style:none}
+  /* ---- retrieval trace ------------------------------------------------ */
+  details.trace{margin:12px 0 0;background:var(--panel);border:1px solid var(--line);
+                border-radius:12px;overflow:hidden}
+  details.trace>summary{cursor:pointer;padding:11px 16px;font-size:var(--t3);
+                        color:var(--dim);user-select:none;list-style:none;
+                        display:flex;align-items:center;gap:8px;transition:background .12s}
   details.trace>summary::-webkit-details-marker{display:none}
+  details.trace>summary::before{content:"›";color:var(--faint);font-size:15px;
+                        transition:transform .15s;display:inline-block}
+  details.trace[open]>summary::before{transform:rotate(90deg)}
   details.trace>summary:hover{background:var(--panel2);color:var(--ink)}
-  .traceBody{padding:4px 14px 12px;border-top:1px solid var(--line)}
-  .prov{display:flex;gap:10px;align-items:baseline;padding:5px 0;font-size:var(--t3)}
-  .hop{font:var(--t4) var(--mono);padding:2px 6px;border-radius:5px;flex:none;
-       letter-spacing:.04em}
-  .hop0{background:rgba(91,157,255,.16);color:#93c0ff}
-  .hop1{background:rgba(52,211,153,.14);color:#6ee7b7}
+  .traceBody{padding:6px 16px 14px;border-top:1px solid var(--line)}
+  .prov{display:flex;gap:11px;align-items:baseline;padding:6px 0;font-size:var(--t3);
+        border-bottom:1px solid rgba(34,43,58,.5)}
+  .prov:last-child{border-bottom:0}
+  .hop{font:var(--t4) var(--mono);padding:2px 7px;border-radius:4px;flex:none;
+       letter-spacing:.05em;text-transform:uppercase}
+  .hop0{background:rgba(107,159,232,.14);color:#9dc0f0}
+  .hop1{background:rgba(91,189,147,.12);color:#86ceae}
+  .hop2{background:rgba(148,163,184,.12);color:var(--dim)}
   .prov .nm{color:var(--ink);font-weight:600}
   .prov .hn{color:var(--faint)}
-  .prov .via{color:var(--ok);font:var(--t4) var(--mono);opacity:.9;margin-top:2px}
+  .prov .via{color:var(--faint);font:var(--t4) var(--mono);margin-top:3px}
 
-  .secTitle{font-size:var(--t4);letter-spacing:.11em;text-transform:uppercase;
-            color:var(--faint);margin:18px 0 8px;display:flex;gap:8px;align-items:center}
+  /* ---- section headings ----------------------------------------------- */
+  .secTitle{font-size:var(--t4);letter-spacing:.13em;text-transform:uppercase;
+            color:var(--dim);margin:26px 0 4px;display:flex;gap:10px;
+            align-items:center;font-weight:600}
+  .secTitle::after{content:"";flex:1;height:1px;background:var(--line)}
+  .secNote{font-size:var(--t3);color:var(--faint);margin:0 0 12px}
 
-  /* Status is carried by the pill and the swatch, not by a slab down the side.
-     Colour alone never decides anything here — the pill spells the status out. */
-  .cite{background:var(--panel);border:1px solid var(--line);border-radius:10px;
-        padding:12px 14px;margin-bottom:8px}
-  .cite.verified{border-color:rgba(52,211,153,.28)}
-  .cite.out_of_context{border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.03)}
-  .cite.unresolved{border-color:rgba(248,113,113,.34);background:rgba(248,113,113,.04)}
-  .citeHead{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-  .swatch{width:7px;height:7px;border-radius:50%;flex:none}
-  .verified .swatch{background:var(--ok)}
-  .out_of_context .swatch{background:var(--warn)}
-  .unresolved .swatch{background:var(--bad)}
-  .citeHead .id{font:600 var(--t2) var(--mono);color:#fff}
-  .tag{font-size:var(--t4);letter-spacing:.07em;text-transform:uppercase;
-       padding:3px 8px;border-radius:20px;font-weight:700}
-  .tag.verified{background:rgba(52,211,153,.15);color:var(--ok)}
-  .tag.out_of_context{background:rgba(251,191,36,.15);color:var(--warn)}
-  .tag.unresolved{background:rgba(248,113,113,.15);color:var(--bad)}
-  .citeHead .hn{color:var(--dim);font-size:var(--t3)}
-  .quote{margin-top:9px;color:#c9d6ea;font-size:var(--t3);line-height:1.7;
-         padding-left:12px;border-left:1px solid var(--line);
-         max-height:5.6em;overflow:hidden;position:relative;cursor:pointer}
+  /* ---- citations ------------------------------------------------------
+     Status is carried by an explicit word, not by colour alone. The card
+     itself stays neutral: a wash of red behind a whole block reads as
+     "error state" when what it actually means is "check this one". */
+  .cite{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+        margin-bottom:10px;overflow:hidden;transition:border-color .15s}
+  .cite:hover{border-color:var(--line2)}
+  .cite.unresolved{border-color:rgba(223,125,125,.32)}
+  .cite.out_of_context{border-color:rgba(217,164,65,.3)}
+
+  .citeHead{display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+            padding:13px 16px}
+  .citeId{font:600 var(--t2) var(--mono);color:#fff;letter-spacing:-.2px}
+  .citeHn{color:var(--dim);font-size:var(--t3);flex:1;min-width:0}
+  .status{display:inline-flex;align-items:center;gap:6px;font-size:var(--t4);
+          letter-spacing:.09em;text-transform:uppercase;font-weight:700;
+          padding:4px 10px;border-radius:5px;white-space:nowrap;
+          border:1px solid transparent}
+  .status .sd{width:5px;height:5px;border-radius:50%;flex:none}
+  .status.verified{color:var(--ok);background:rgba(91,189,147,.1);
+                   border-color:rgba(91,189,147,.22)}
+  .status.verified .sd{background:var(--ok)}
+  .status.out_of_context{color:var(--warn);background:rgba(217,164,65,.1);
+                         border-color:rgba(217,164,65,.24)}
+  .status.out_of_context .sd{background:var(--warn)}
+  .status.unresolved{color:var(--bad);background:rgba(223,125,125,.1);
+                     border-color:rgba(223,125,125,.26)}
+  .status.unresolved .sd{background:var(--bad)}
+
+  /* The Act's exact words. Serif, generous leading, ruled left edge — set
+     like a pull-quote from a statute, because that is what it is. */
+  .quote{margin:0;padding:14px 18px 15px;border-top:1px solid var(--line);
+         background:var(--panel2);
+         font:var(--t2)/1.75 var(--serif);color:#d6e0ee;
+         max-height:6.4em;overflow:hidden;position:relative;white-space:pre-wrap}
+  .quote::before{content:"";position:absolute;left:0;top:14px;bottom:14px;
+         width:2px;background:var(--accent-dim);border-radius:2px}
   .quote.open{max-height:none}
   .quote:not(.open)::after{content:"";position:absolute;left:0;right:0;bottom:0;
-       height:2.2em;background:linear-gradient(transparent,var(--panel))}
-  .note{margin-top:8px;font-size:var(--t3);color:var(--warn)}
-  .cite.unresolved .note{color:var(--bad)}
+         height:2.6em;background:linear-gradient(transparent,var(--panel2))}
+  .more{display:block;width:100%;text-align:left;background:none;border:0;
+        border-top:1px solid var(--line);color:var(--dim);cursor:pointer;
+        font:var(--t3) inherit;padding:9px 18px;transition:color .12s,background .12s}
+  .more:hover{color:var(--ink);background:var(--panel2)}
+  .note{padding:11px 16px;border-top:1px solid var(--line);
+        font-size:var(--t3);color:var(--warn);background:rgba(217,164,65,.05)}
+  .cite.unresolved .note{color:var(--bad);background:rgba(223,125,125,.05)}
 
-  .penWrap{border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+  /* ---- entailment claims ---------------------------------------------- */
+  .claim{display:flex;gap:11px;align-items:flex-start;padding:10px 14px;
+         font-size:var(--t3);background:var(--panel);border:1px solid var(--line);
+         border-radius:10px;margin-bottom:7px;line-height:1.6}
+  .claim.unsupported{border-color:rgba(223,125,125,.3)}
+  .claim .ck{font:var(--t4) var(--mono);padding:3px 7px;border-radius:4px;flex:none;
+             letter-spacing:.05em;text-transform:uppercase;font-weight:700}
+  .claim.supported .ck{background:rgba(91,189,147,.12);color:var(--ok)}
+  .claim.unsupported .ck{background:rgba(223,125,125,.12);color:var(--bad)}
+  .claim .txt{color:var(--dim);flex:1;min-width:0}
+  .claim.unsupported .txt{color:var(--ink)}
+  .claim .sc{font:var(--t4) var(--mono);color:var(--faint);flex:none}
+
+  /* ---- penalty table --------------------------------------------------- */
+  .penWrap{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .penScroll{overflow-x:auto}
   table.pen{width:100%;border-collapse:collapse;font-size:var(--t3);
             background:var(--panel)}
-  table.pen th{padding:8px 13px;text-align:left;font-size:var(--t4);font-weight:700;
-               letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
-               border-bottom:1px solid var(--line);white-space:nowrap}
-  table.pen td{padding:9px 13px;border-top:1px solid var(--line);vertical-align:top}
+  table.pen th{padding:10px 15px;text-align:left;font-size:var(--t4);font-weight:700;
+               letter-spacing:.1em;text-transform:uppercase;color:var(--faint);
+               border-bottom:1px solid var(--line);white-space:nowrap;
+               background:var(--panel2)}
+  table.pen td{padding:11px 15px;border-top:1px solid var(--line);vertical-align:top}
+  table.pen tr:hover td{background:var(--panel2)}
   table.pen td:first-child{font:600 var(--t3) var(--mono);white-space:nowrap;color:#fff}
   /* The amount column absorbs the slack so "applies to" sits next to its row
      rather than drifting to the far edge with nothing tying them together. */
   table.pen td:nth-child(2),table.pen th:nth-child(2){width:100%}
+  table.pen td:nth-child(2){color:#e8edf6}
   table.pen td:last-child{color:var(--dim);font:var(--t3) var(--mono);white-space:nowrap}
-  .authoritative{font-size:var(--t3);color:var(--ok);margin-bottom:7px}
 
-  .meta{margin-top:12px;font:var(--t3) var(--mono);color:var(--faint)}
-  .err{background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.3);
-       color:#fca5a5;border-radius:10px;padding:12px 14px;white-space:pre-wrap}
-  .abstain{background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.3);
-       color:#fcd34d;border-radius:10px;padding:12px 14px;white-space:pre-wrap}
+  .meta{margin-top:14px;font:var(--t3) var(--mono);color:var(--faint);
+        display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .meta .sep{color:var(--line2)}
 
-  footer{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(
-         transparent,var(--bg) 22%);padding:22px 20px 18px}
-  .bar{max-width:1180px;margin:0 auto;display:flex;gap:10px}
-  #q{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);
-     border-radius:11px;padding:13px 15px;font:var(--t2) inherit;resize:none;
-     max-height:150px;min-height:48px}
-  #q:focus{outline:none;border-color:var(--accent)}
-  #send{background:var(--accent);color:#04122b;border:0;border-radius:11px;
-        padding:0 22px;font:650 var(--t2) inherit;cursor:pointer}
-  #send:disabled{opacity:.45;cursor:not-allowed}
-  .examples{max-width:1180px;margin:0 auto 10px;display:flex;gap:7px;flex-wrap:wrap}
+  .err{background:rgba(223,125,125,.07);border:1px solid rgba(223,125,125,.28);
+       color:#f0b4b4;border-radius:12px;padding:14px 16px;white-space:pre-wrap}
+  .abstain{background:rgba(217,164,65,.07);border:1px solid rgba(217,164,65,.28);
+       color:#e8c884;border-radius:12px;padding:14px 16px;white-space:pre-wrap}
+
+  /* ---- composer -------------------------------------------------------- */
+  footer{position:fixed;bottom:0;left:0;right:0;
+         background:linear-gradient(transparent,var(--bg) 24%);padding:26px 24px 20px}
+  .bar{max-width:1100px;margin:0 auto;display:flex;gap:10px;align-items:flex-end}
+  #q{flex:1;background:var(--panel);border:1px solid var(--line2);color:var(--ink);
+     border-radius:12px;padding:14px 16px;font:var(--t2)/1.5 inherit;resize:none;
+     max-height:150px;min-height:50px;transition:border-color .15s,box-shadow .15s}
+  #q::placeholder{color:var(--faint)}
+  #q:focus{outline:none;border-color:var(--accent-dim);
+           box-shadow:0 0 0 3px rgba(107,159,232,.1)}
+  #send{background:var(--accent);color:#08111f;border:0;border-radius:12px;
+        padding:0 24px;height:50px;font:650 var(--t2) inherit;cursor:pointer;
+        transition:opacity .15s,transform .05s}
+  #send:hover:not(:disabled){opacity:.92}
+  #send:active:not(:disabled){transform:translateY(1px)}
+  #send:disabled{opacity:.4;cursor:not-allowed}
+  .examples{max-width:1100px;margin:0 auto 11px;display:flex;gap:7px;flex-wrap:wrap}
   .ex{background:var(--panel);border:1px solid var(--line);color:var(--dim);
-      border-radius:20px;padding:6px 12px;font-size:var(--t3);cursor:pointer}
-  .ex:hover{border-color:var(--accent);color:var(--ink)}
+      border-radius:20px;padding:7px 13px;font-size:var(--t3);cursor:pointer;
+      transition:border-color .15s,color .15s}
+  .ex:hover{border-color:var(--accent-dim);color:var(--ink)}
+
   /* The answer box is pre-wrap so model output keeps its blank lines; the
      static intro is ordinary prose and must not inherit the source's wrapping. */
-  .hint{color:var(--dim);font-size:var(--t3);line-height:1.8;white-space:normal}
-  .hint p{margin:0 0 9px}
+  .hint{color:var(--dim);font-size:var(--t3);line-height:1.85;white-space:normal}
+  .hint p{margin:0 0 10px}
   .hint p:last-child{margin-bottom:0}
+  .hint .lede{color:var(--ink);font-size:var(--t2);line-height:1.6}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:13px;padding-top:13px;
+          border-top:1px solid var(--line)}
+  .lg{display:flex;align-items:center;gap:7px;font-size:var(--t3);color:var(--faint)}
+  .lg i{width:6px;height:6px;border-radius:50%;display:inline-block;font-style:normal}
+  .lg b{color:var(--dim);font-weight:600}
+
+  @media (max-width:640px){
+    header{padding:12px 16px;gap:9px}
+    header h1{font-size:16px}
+    main{padding:20px 16px 160px}
+    footer{padding:20px 16px 16px}
+    .citeHead{padding:12px 14px}
+    .quote{padding:12px 15px}
+  }
 </style>
 
 <header>
   <span class="dot" id="dot"></span>
-  <h1>DPDP Act 2023 — assistant</h1>
+  <h1>DPDP Act 2023</h1>
   <span class="sub" id="status">connecting…</span>
-  <span class="sub" style="margin-left:auto">every citation is checked against the Act</span>
+  <span class="badge" id="build" hidden></span>
+  <span class="sub" style="margin-left:auto">Every citation is resolved against the Act</span>
 </header>
 
 <main id="feed">
   <div class="msg">
     <div class="who">Assistant</div>
     <div class="answer hint">
-      <p>Ask about the Digital Personal Data Protection Act, 2023 in plain English —
-         no legal wording needed.</p>
+      <p class="lede">Ask about the Digital Personal Data Protection Act, 2023 in
+         plain English. No legal wording needed.</p>
       <p>Every answer quotes the Act verbatim. Each citation is then resolved against
-         the knowledge graph and marked <b style="color:var(--ok)">verified</b>,
-         <b style="color:var(--warn)">out of context</b>, or
-         <b style="color:var(--bad)">unresolved</b> — so you can tell a real citation
-         from an invented one. Penalty amounts are read straight from the graph and
-         never pass through the model.</p>
+         the knowledge graph, so you can tell a real citation from an invented one.
+         Penalty amounts are read straight from the graph and never pass through the
+         model.</p>
+      <div class="legend">
+        <span class="lg"><i style="background:var(--ok)"></i><b>Verified</b>&nbsp;exists and was retrieved</span>
+        <span class="lg"><i style="background:var(--warn)"></i><b>Out of context</b>&nbsp;exists, but wasn't retrieved</span>
+        <span class="lg"><i style="background:var(--bad)"></i><b>Unresolved</b>&nbsp;no such provision</span>
+      </div>
     </div>
   </div>
 </main>
@@ -182,12 +279,19 @@ EXAMPLES.forEach(t => {
 });
 
 const esc = s => (s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const HEADINGS = /^(Short answer|Why|The law says|What to do|Penalty):/gm;
+const fmt = t => esc(t).replace(HEADINGS, '<b>$1:</b>');
 
 fetch('/api/health').then(r => r.json()).then(h => {
   document.getElementById('dot').className = 'dot ' + (h.ok ? 'on' : 'off');
   document.getElementById('status').textContent = h.ok
     ? `${h.model} · ${h.chunks} provisions · ${h.nodes} graph nodes`
     : h.detail;
+  if (h.build_id) {
+    const b = document.getElementById('build');
+    b.textContent = 'build ' + h.build_id;
+    b.hidden = false;
+  }
 }).catch(() => {
   document.getElementById('dot').className = 'dot off';
   document.getElementById('status').textContent = 'backend unreachable';
@@ -213,20 +317,33 @@ function block(who, cls) {
   return { wrap, body };
 }
 
+function section(host, title, note) {
+  const h = document.createElement('div');
+  h.className = 'secTitle';
+  h.append(title);
+  host.appendChild(h);
+  if (note) {
+    const n = document.createElement('div');
+    n.className = 'secNote';
+    n.textContent = note;
+    host.appendChild(n);
+  }
+}
+
 function renderRetrieval(host, d) {
-  const seeds = d.provisions.filter(p => p.hop === 0);
-  const hops  = d.provisions.filter(p => p.hop === 1);
+  const seeds = d.provisions.filter(p => p.hop === 0).length;
+  const viaGraph = d.provisions.length - seeds;
   const det = document.createElement('details');
   det.className = 'trace';
-  det.innerHTML = `<summary>How this was found —
-    ${seeds.length} matched directly, ${hops.length} pulled in through the graph
+  det.innerHTML = `<summary><span>How this was found:
+    ${seeds} matched directly, ${viaGraph} pulled in through the graph
     · ${d.elapsed_ms} ms${d.vocabulary.length
-      ? ' · read as: ' + esc(d.vocabulary.join(', ')) : ''}</summary>`;
+      ? ' · read as: ' + esc(d.vocabulary.join(', ')) : ''}</span></summary>`;
   const body = document.createElement('div');
   body.className = 'traceBody';
   body.innerHTML = d.provisions.map(p => `
     <div class="prov">
-      <span class="hop hop${p.hop}">${p.hop === 0 ? 'bm25' : 'graph'}</span>
+      <span class="hop hop${Math.min(p.hop, 2)}">${p.hop === 0 ? 'match' : 'hop ' + p.hop}</span>
       <span>
         <span class="nm">${esc(p.label)}</span>
         ${p.headnote ? `<span class="hn"> — ${esc(p.headnote)}</span>` : ''}
@@ -238,50 +355,74 @@ function renderRetrieval(host, d) {
 }
 
 function renderCitations(host, d) {
-  if (d.citations.length) {
+  if (d.citations && d.citations.length) {
     const bad = d.citations.filter(c => c.status !== 'verified').length;
-    const h = document.createElement('div');
-    h.className = 'secTitle';
-    h.innerHTML = `Citations checked against the Act` +
-      (bad ? ` <span style="color:var(--warn)">· ${bad} need attention</span>` : '');
-    host.appendChild(h);
+    section(host, 'Citations checked against the Act',
+      bad ? `${bad} of ${d.citations.length} need attention. See the status on each.`
+          : `All ${d.citations.length} resolve to provisions that were actually retrieved.`);
 
     d.citations.forEach(c => {
       const el = document.createElement('div');
       el.className = 'cite ' + c.status;
       el.innerHTML = `
         <div class="citeHead">
-          <span class="swatch"></span>
-          <span class="id">${esc(c.label)}</span>
-          <span class="tag ${c.status}">${c.status.replace(/_/g, ' ')}</span>
-          ${c.headnote ? `<span class="hn">${esc(c.headnote)}</span>` : ''}
+          <span class="citeId">${esc(c.label)}</span>
+          <span class="status ${c.status}"><i class="sd"></i>${esc(c.status.replace(/_/g, ' '))}</span>
+          ${c.headnote ? `<span class="citeHn">${esc(c.headnote)}</span>` : ''}
         </div>
         ${c.text ? `<div class="quote">${esc(c.text)}</div>` : ''}
         ${c.note ? `<div class="note">${esc(c.note)}</div>` : ''}`;
+
+      // An explicit control, not a mystery click target: the previous version
+      // made the quote itself clickable with nothing saying so.
       const q = el.querySelector('.quote');
-      if (q) q.onclick = () => q.classList.toggle('open');
+      if (q) {
+        requestAnimationFrame(() => {
+          if (q.scrollHeight <= q.clientHeight + 2) return;  // fits already
+          const btn = document.createElement('button');
+          btn.className = 'more';
+          btn.textContent = 'Show the full provision';
+          btn.onclick = () => {
+            const open = q.classList.toggle('open');
+            btn.textContent = open ? 'Show less' : 'Show the full provision';
+          };
+          q.insertAdjacentElement('afterend', btn);
+        });
+      }
       host.appendChild(el);
     });
   }
 
-  if (d.penalties.length) {
-    const h = document.createElement('div');
-    h.className = 'secTitle';
-    h.textContent = 'Penalty amounts';
-    host.appendChild(h);
-    const note = document.createElement('div');
-    note.className = 'authoritative';
-    note.textContent = 'read directly from the graph — these never pass through the model';
-    host.appendChild(note);
+  // Entailment results, when the check is enabled server-side. Citations
+  // answer "does this provision exist"; claims answer "does it actually say
+  // what the answer claims" — a different question, so a different section.
+  if (d.claims && d.claims.length) {
+    const weak = d.claims.filter(c => c.status === 'unsupported');
+    section(host, 'Statement check',
+      weak.length ? `${weak.length} statement${weak.length > 1 ? 's are' : ' is'} not supported by the text of the provisions cited.`
+                  : 'Every statement is supported by the text of the provisions cited.');
+    d.claims.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'claim ' + c.status;
+      el.innerHTML = `<span class="ck">${c.status === 'supported' ? 'supported' : 'unsupported'}</span>
+        <span class="txt">${esc(c.claim)}</span>
+        <span class="sc">${c.entailment.toFixed(2)}</span>`;
+      host.appendChild(el);
+    });
+  }
+
+  if (d.penalties && d.penalties.length) {
+    section(host, 'Penalty amounts',
+      'Read directly from the knowledge graph. These never pass through the model.');
     const wrap = document.createElement('div');
     wrap.className = 'penWrap';
-    wrap.innerHTML = `<table class="pen">
+    wrap.innerHTML = `<div class="penScroll"><table class="pen">
       <tr><th>Entry</th><th>Maximum penalty</th><th>Applies to</th></tr>
       ${d.penalties.map(p => `<tr>
         <td>${esc(p.entry)}</td>
         <td>${esc(p.amount)}</td>
         <td>${p.applies_to.length ? esc(p.applies_to.join(', ')) : '—'}</td>
-      </tr>`).join('')}</table>`;
+      </tr>`).join('')}</table></div>`;
     host.appendChild(wrap);
   }
 }
@@ -331,19 +472,21 @@ async function ask() {
           renderRetrieval(wrap, d);
         } else if (ev === 'token') {
           text += d.t;
-          body.innerHTML = esc(text).replace(
-            /^(Short answer|Why|The law says|What to do|Penalty):/gm, '<b>$1:</b>')
-            + '<span class="cursor"></span>';
+          body.innerHTML = fmt(text) + '<span class="cursor"></span>';
           window.scrollTo(0, document.body.scrollHeight);
         } else if (ev === 'citations') {
-          body.innerHTML = esc(text).replace(
-            /^(Short answer|Why|The law says|What to do|Penalty):/gm, '<b>$1:</b>');
+          body.innerHTML = fmt(text);
           renderCitations(wrap, d);
         } else if (ev === 'done') {
           const m = document.createElement('div');
           m.className = 'meta';
-          m.textContent = `${d.model} · ${(d.elapsed_ms / 1000).toFixed(1)}s · `
-                        + `${d.context_chars.toLocaleString()} chars of statute in context`;
+          const bits = [
+            esc(d.model),
+            `${(d.elapsed_ms / 1000).toFixed(1)}s`,
+            `${d.context_chars.toLocaleString()} chars of statute in context`,
+          ];
+          if (d.build_id) bits.push('build ' + esc(d.build_id));
+          m.innerHTML = bits.join(' <span class="sep">·</span> ');
           wrap.appendChild(m);
         } else if (ev === 'error') {
           body.className = 'err';
@@ -354,7 +497,7 @@ async function ask() {
         }
       }
     }
-    if (body.querySelector('.cursor')) body.innerHTML = esc(text);
+    if (body.querySelector('.cursor')) body.innerHTML = fmt(text);
   } catch (e) {
     body.className = 'err';
     body.textContent = 'Request failed: ' + e.message;
