@@ -1,0 +1,12 @@
+# Credentials. Never commit.
+.env
+
+# Contains full questions and answers — operational data, not source.
+logs/
+
+# Derived by `python -m kg_build`.
+data/chunks.json
+
+__pycache__/
+*.pyc
+.venv/

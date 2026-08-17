@@ -1,0 +1,21 @@
+# Runtime — what the backend needs to serve answers.
+fastapi>=0.115
+uvicorn[standard]>=0.32
+sse-starlette>=2.1
+pydantic>=2.9
+neo4j>=5.24
+rank-bm25>=0.2.2
+snowballstemmer>=2.2
+PyYAML>=6.0
+
+# Build only — kg_build. Not imported by the serving path.
+pdfplumber>=0.11
+networkx>=3.3
+
+# Optional: only when DPDP_PROVIDER=claude.
+# anthropic>=0.40
+
+# Optional: only when LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY are set.
+# >=3.0 for the start_as_current_observation() API observability.py uses;
+# tested against 4.14.4.
+langfuse>=3.0

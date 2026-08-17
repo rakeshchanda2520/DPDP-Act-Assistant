@@ -1,0 +1,7 @@
+# Human corrections applied after reading review/. Overrides always win.
+# headnotes:
+#   s-12: "Right to correction and erasure of personal data."
+# drop_xrefs:
+#   - [s-8-5, s-8-5]
+headnotes: {}
+drop_xrefs: []

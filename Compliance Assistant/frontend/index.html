@@ -1,0 +1,701 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DPDP Act 2023 — Compliance Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ═══════════════════════════════════════════════════════════════════════
+     Design system. Typography and palette are not arbitrary: EB Garamond /
+     Lato is the pairing indexed for "law firms, legal services, contracts,
+     formal documents", and the palette is authority navy + trust gold.
+     Deliberately NOT the purple/violet gradient every AI product ships —
+     this needs to read as a legal instrument, not a chatbot toy.
+
+     Light is the default because the artifact being quoted is a statute:
+     a document. Dark is a first-class toggle, not an afterthought.
+     ══════════════════════════════════════════════════════════════════════ */
+  :root{
+    --navy:#1E3A8A; --navy-600:#1E40AF; --navy-300:#93A9DC;
+    --gold:#B45309; --gold-soft:#FEF3C7;
+
+    --bg:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9; --surface-3:#E9EEF5;
+    --line:#CBD5E1; --line-soft:#E2E8F0;
+    /* Ramp is contrast-checked, not eyeballed: every step clears WCAG AA
+       (4.5:1) against --bg AND --surface-2. The original --fg-4 (#94A3B8)
+       measured 2.45:1 — and it styles the "not legal advice" disclaimer,
+       which is the one line on the page that must never be hard to read. */
+    --fg:#0F172A; --fg-2:#334155; --fg-3:#475569; --fg-4:#5B6B80;
+
+    --ok:#15803D; --ok-bg:#F0FDF4; --ok-line:#BBF7D0;
+    --warn:#B45309; --warn-bg:#FFFBEB; --warn-line:#FDE68A;
+    --bad:#B91C1C; --bad-bg:#FEF2F2; --bad-line:#FECACA;
+
+    --ui:'Lato',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --doc:'EB Garamond',Georgia,'Times New Roman',serif;
+    --mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+
+    --r:10px; --r-lg:14px;
+    --shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.06);
+    --shadow-lg:0 4px 6px -1px rgba(15,23,42,.07),0 10px 20px -6px rgba(15,23,42,.10);
+    --ring:0 0 0 3px rgba(30,58,138,.18);
+  }
+  [data-theme="dark"]{
+    --navy:#7BA3F0; --navy-600:#6B93E4; --navy-300:#3B5486;
+    --gold:#E0A94A; --gold-soft:#3A2E14;
+
+    --bg:#0B0F17; --surface:#121826; --surface-2:#171F2F; --surface-3:#1D2739;
+    --line:#2A364C; --line-soft:#212B3D;
+    --fg:#E9EEF7; --fg-2:#C3CEDF; --fg-3:#95A5BC; --fg-4:#8291A8;
+
+    --ok:#5BBD93; --ok-bg:#0F1F19; --ok-line:#1E4435;
+    --warn:#E0A94A; --warn-bg:#221B0D; --warn-line:#4A3A18;
+    --bad:#E88989; --bad-bg:#241315; --bad-line:#4D2529;
+
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+    --shadow-lg:0 4px 6px -1px rgba(0,0,0,.4),0 10px 20px -6px rgba(0,0,0,.5);
+    --ring:0 0 0 3px rgba(123,163,240,.25);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+                         transition-duration:.01ms!important}
+  }
+  body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--ui);
+       -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+  :focus-visible{outline:2px solid var(--navy);outline-offset:2px;border-radius:4px}
+  button{font:inherit;cursor:pointer}
+  .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+      clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* ── header ─────────────────────────────────────────────────────────── */
+  header{position:sticky;top:0;z-index:20;background:var(--surface);
+         border-bottom:1px solid var(--line-soft);box-shadow:var(--shadow)}
+  .hrow{max-width:1080px;margin:0 auto;padding:12px 24px;display:flex;
+        align-items:center;gap:14px}
+  .mark{width:34px;height:34px;border-radius:9px;background:var(--navy);color:#fff;
+        display:grid;place-items:center;flex:none;font:700 15px/1 var(--doc)}
+  [data-theme="dark"] .mark{color:#0B0F17}
+  .htitle{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .htitle h1{margin:0;font:700 15px/1.25 var(--ui);letter-spacing:-.01em}
+  .htitle .meta{font:400 12px/1.3 var(--ui);color:var(--fg-3);
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hspace{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .status{display:inline-flex;align-items:center;gap:7px;font:400 12px/1 var(--ui);
+          color:var(--fg-3);padding:6px 11px;border:1px solid var(--line-soft);
+          border-radius:999px;background:var(--surface-2);white-space:nowrap}
+  .status i{width:6px;height:6px;border-radius:50%;background:var(--fg-4);flex:none}
+  .status.on i{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 18%,transparent)}
+  .status.off i{background:var(--bad)}
+  .iconbtn{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;
+           border:1px solid var(--line-soft);background:var(--surface-2);color:var(--fg-2);
+           transition:background .15s,color .15s,border-color .15s}
+  .iconbtn:hover{background:var(--surface-3);color:var(--fg);border-color:var(--line)}
+  .iconbtn svg{width:17px;height:17px}
+  [data-theme="dark"] .sun{display:block} [data-theme="dark"] .moon{display:none}
+  .sun{display:none} .moon{display:block}
+
+  /* ── layout ─────────────────────────────────────────────────────────── */
+  main{max-width:1080px;margin:0 auto;padding:32px 24px 200px}
+  .turn{margin:0 0 36px;animation:rise .32s cubic-bezier(.2,.7,.3,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .role{display:flex;align-items:center;gap:8px;font:700 11px/1 var(--ui);
+        letter-spacing:.1em;text-transform:uppercase;color:var(--fg-4);margin-bottom:10px}
+  .role svg{width:13px;height:13px}
+
+  /* The question reads as an inset note against the answer's raised card —
+     depth does the separating, so no accent bar is needed. */
+  .ask{background:var(--surface-2);border:1px solid var(--line-soft);
+       border-radius:var(--r);padding:14px 18px;font:400 16px/1.55 var(--ui);
+       color:var(--fg)}
+
+  .reply{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r-lg);
+         box-shadow:var(--shadow);overflow:hidden}
+  .prose{padding:22px 24px;font:400 16px/1.72 var(--ui);color:var(--fg-2);
+         white-space:pre-wrap;word-break:break-word}
+  .prose h4{margin:20px 0 6px;font:900 11px/1 var(--ui);letter-spacing:.11em;
+            text-transform:uppercase;color:var(--navy)}
+  .prose h4:first-child{margin-top:0}
+  .prose strong{color:var(--fg);font-weight:700}
+
+  /* Numbered inline citation — the single highest-value trust affordance:
+     the claim and its source are one click apart, both directions. */
+  .ref{display:inline-block;min-width:16px;height:16px;padding:0 4px;margin:0 1px 0 4px;
+       vertical-align:3px;border-radius:4px;background:var(--navy);color:#fff;
+       font:700 10px/16px var(--mono);text-align:center;text-decoration:none;
+       transition:transform .12s,background .12s}
+  [data-theme="dark"] .ref{color:#0B0F17}
+  .ref:hover{background:var(--gold);transform:translateY(-1px)}
+
+  .caret{display:inline-block;width:2px;height:1.05em;background:var(--navy);
+         vertical-align:-2px;animation:blink 1.05s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  .actions{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line-soft);
+           background:var(--surface-2)}
+  .act{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;
+       border:1px solid transparent;background:none;color:var(--fg-3);
+       font:400 12.5px/1 var(--ui);transition:background .15s,color .15s}
+  .act:hover{background:var(--surface-3);color:var(--fg)}
+  .act svg{width:14px;height:14px}
+
+  /* ── evidence sections ──────────────────────────────────────────────── */
+  .band{margin:22px 0 10px;display:flex;align-items:baseline;gap:12px}
+  .band h3{margin:0;font:900 11px/1 var(--ui);letter-spacing:.12em;
+           text-transform:uppercase;color:var(--fg-3);white-space:nowrap}
+  .band .lede{font:400 13px/1.4 var(--ui);color:var(--fg-4)}
+  .band::after{content:"";flex:1;height:1px;background:var(--line-soft)}
+
+  .src{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);
+       margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow);
+       transition:box-shadow .2s,border-color .2s}
+  .src:hover{box-shadow:var(--shadow-lg)}
+  .src:target,.src.flash{border-color:var(--navy);box-shadow:var(--ring)}
+  /* Status lives in the pill (icon + word + colour), so the card only needs
+     to shift its own border when something is wrong — enough to catch the eye
+     scanning a stack of sources, without a slab down the side. */
+  .src.s-out_of_context{border-color:var(--warn-line)}
+  .src.s-unresolved{border-color:var(--bad-line)}
+
+  .srcTop{display:flex;align-items:center;gap:11px;padding:13px 16px;flex-wrap:wrap}
+  .num{width:21px;height:21px;border-radius:6px;background:var(--navy);color:#fff;flex:none;
+       font:700 11px/21px var(--mono);text-align:center}
+  [data-theme="dark"] .num{color:#0B0F17}
+  .cid{font:700 15px/1 var(--mono);color:var(--fg);letter-spacing:-.02em}
+  .chead{font:400 13px/1.4 var(--ui);color:var(--fg-3);flex:1;min-width:0}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:6px;
+        font:700 10px/1 var(--ui);letter-spacing:.07em;text-transform:uppercase;
+        white-space:nowrap;border:1px solid}
+  .pill svg{width:11px;height:11px}
+  .s-verified .pill{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+  .s-out_of_context .pill{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-line)}
+  .s-unresolved .pill{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-line)}
+
+  /* The Act's own words, set as a document: serif, generous measure. This is
+     the one place the interface must not look like software. */
+  .verbatim{margin:0;padding:16px 20px 18px;border-top:1px solid var(--line-soft);
+            background:var(--surface-2);font:400 17px/1.68 var(--doc);color:var(--fg);
+            white-space:pre-wrap;position:relative;max-height:7.2em;overflow:hidden}
+  .verbatim.open{max-height:none}
+  .verbatim::after{content:"";position:absolute;inset:auto 0 0 0;height:3em;
+                   background:linear-gradient(transparent,var(--surface-2))}
+  .verbatim.open::after{display:none}
+  .expand{display:flex;align-items:center;gap:6px;width:100%;padding:9px 20px;
+          border:0;border-top:1px solid var(--line-soft);background:var(--surface);
+          color:var(--fg-3);font:400 12.5px/1 var(--ui);transition:background .15s,color .15s}
+  .expand:hover{background:var(--surface-2);color:var(--navy)}
+  .expand svg{width:13px;height:13px;transition:transform .2s}
+  .expand[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .flag{padding:11px 16px;border-top:1px solid var(--line-soft);
+        font:400 13px/1.5 var(--ui);color:var(--warn);background:var(--warn-bg)}
+  .s-unresolved .flag{color:var(--bad);background:var(--bad-bg)}
+
+  /* ── statement check (entailment) ───────────────────────────────────── */
+  .stmt{display:flex;gap:11px;align-items:flex-start;padding:12px 15px;margin-bottom:8px;
+        background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);
+        font:400 14px/1.6 var(--ui)}
+  .stmt.unsupported{border-color:var(--bad-line);background:var(--bad-bg)}
+  .stmt .tick{flex:none;width:17px;height:17px;margin-top:2px}
+  .stmt.supported .tick{color:var(--ok)} .stmt.unsupported .tick{color:var(--bad)}
+  .stmt .body{flex:1;min-width:0;color:var(--fg-2)}
+  .stmt.unsupported .body{color:var(--fg)}
+  .stmt .val{font:400 11px/1 var(--mono);color:var(--fg-4);flex:none;margin-top:4px}
+
+  /* ── penalties ──────────────────────────────────────────────────────── */
+  .tblWrap{border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;
+           box-shadow:var(--shadow)}
+  .tblScroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font:400 14px/1.5 var(--ui);background:var(--surface)}
+  th{padding:10px 16px;text-align:left;font:900 10px/1 var(--ui);letter-spacing:.1em;
+     text-transform:uppercase;color:var(--fg-4);background:var(--surface-2);
+     border-bottom:1px solid var(--line-soft);white-space:nowrap}
+  td{padding:12px 16px;border-top:1px solid var(--line-soft);vertical-align:top;color:var(--fg-2)}
+  tbody tr:hover td{background:var(--surface-2)}
+  td:first-child{font:700 13px/1.4 var(--mono);color:var(--fg);white-space:nowrap}
+  td:nth-child(2){width:100%;color:var(--fg);font-weight:400}
+  td:last-child{font:400 13px/1.4 var(--mono);color:var(--fg-3);white-space:nowrap}
+
+  /* ── trace ──────────────────────────────────────────────────────────── */
+  details.trace{margin-top:14px;border:1px solid var(--line-soft);border-radius:var(--r);
+                background:var(--surface);overflow:hidden}
+  details.trace summary{display:flex;align-items:center;gap:9px;padding:11px 16px;
+                        font:400 13px/1.4 var(--ui);color:var(--fg-3);list-style:none;
+                        transition:background .15s,color .15s}
+  details.trace summary::-webkit-details-marker{display:none}
+  details.trace summary:hover{background:var(--surface-2);color:var(--fg)}
+  details.trace summary svg{width:13px;height:13px;flex:none;transition:transform .2s}
+  details.trace[open] summary svg{transform:rotate(90deg)}
+  .traceIn{padding:4px 16px 12px;border-top:1px solid var(--line-soft)}
+  .hopRow{display:flex;gap:11px;align-items:baseline;padding:8px 0;
+          border-bottom:1px solid var(--line-soft);font:400 13px/1.5 var(--ui)}
+  .hopRow:last-child{border-bottom:0}
+  .tag{flex:none;padding:3px 8px;border-radius:5px;font:700 10px/1 var(--mono);
+       letter-spacing:.04em;text-transform:uppercase}
+  .t0{background:color-mix(in srgb,var(--navy) 13%,transparent);color:var(--navy)}
+  .t1{background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok)}
+  .t2{background:var(--surface-3);color:var(--fg-3)}
+  .hopRow b{color:var(--fg);font-weight:700} .hopRow span{color:var(--fg-3)}
+  .hopRow .edge{display:block;font:400 11px/1.4 var(--mono);color:var(--fg-4);margin-top:2px}
+
+  .foot{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+        font:400 12px/1 var(--mono);color:var(--fg-4)}
+  .foot .d{width:3px;height:3px;border-radius:50%;background:var(--line)}
+
+  .notice{border-radius:var(--r-lg);padding:16px 18px;font:400 15px/1.6 var(--ui);
+          display:flex;gap:12px;align-items:flex-start}
+  .notice svg{width:19px;height:19px;flex:none;margin-top:2px}
+  .notice.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn)}
+  .notice.bad{background:var(--bad-bg);border:1px solid var(--bad-line);color:var(--bad)}
+
+  /* ── welcome ────────────────────────────────────────────────────────── */
+  .welcome{border:1px solid var(--line-soft);border-radius:var(--r-lg);background:var(--surface);
+           padding:30px 32px;box-shadow:var(--shadow)}
+  .welcome h2{margin:0 0 10px;font:400 30px/1.25 var(--doc);color:var(--fg);letter-spacing:-.01em}
+  .welcome p{margin:0 0 18px;font:400 16px/1.65 var(--ui);color:var(--fg-2);max-width:62ch}
+  .keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;
+        padding-top:18px;border-top:1px solid var(--line-soft)}
+  .key{display:flex;gap:10px;align-items:flex-start}
+  .key svg{width:17px;height:17px;flex:none;margin-top:2px;color:var(--navy)}
+  .key b{display:block;font:700 13px/1.4 var(--ui);color:var(--fg);margin-bottom:1px}
+  .key span{font:400 13px/1.5 var(--ui);color:var(--fg-3)}
+
+  /* ── composer ───────────────────────────────────────────────────────── */
+  footer{position:fixed;inset:auto 0 0 0;padding:0 24px 20px;
+         background:linear-gradient(transparent,var(--bg) 22%);z-index:15}
+  .cwrap{max-width:1080px;margin:0 auto}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+  .chip{padding:7px 13px;border-radius:999px;border:1px solid var(--line-soft);
+        background:var(--surface);color:var(--fg-2);font:400 13px/1 var(--ui);
+        box-shadow:var(--shadow);transition:border-color .15s,color .15s,transform .12s}
+  .chip:hover{border-color:var(--navy);color:var(--navy);transform:translateY(-1px)}
+  .box{display:flex;gap:10px;align-items:flex-end;background:var(--surface);
+       border:1px solid var(--line);border-radius:var(--r-lg);padding:8px 8px 8px 16px;
+       box-shadow:var(--shadow-lg);transition:border-color .15s,box-shadow .15s}
+  .box:focus-within{border-color:var(--navy);box-shadow:var(--shadow-lg),var(--ring)}
+  #q{flex:1;border:0;background:none;color:var(--fg);resize:none;padding:11px 0;
+     font:400 16px/1.55 var(--ui);max-height:180px;min-height:24px}
+  #q:focus{outline:none} #q::placeholder{color:var(--fg-4)}
+  .go{width:40px;height:40px;flex:none;border:0;border-radius:10px;background:var(--navy);
+      color:#fff;display:grid;place-items:center;transition:opacity .15s,transform .08s}
+  [data-theme="dark"] .go{color:#0B0F17}
+  .go:hover:not(:disabled){opacity:.9} .go:active:not(:disabled){transform:scale(.95)}
+  .go:disabled{opacity:.35;cursor:not-allowed}
+  .go svg{width:17px;height:17px}
+  .legal{margin:9px 2px 0;font:400 11.5px/1.4 var(--ui);color:var(--fg-4);text-align:center}
+
+  @media (max-width:720px){
+    .hrow{padding:10px 16px;gap:10px}
+    .htitle .meta{display:none}
+    main{padding:22px 16px 210px}
+    footer{padding:0 16px 16px}
+    .welcome{padding:22px 20px} .welcome h2{font-size:25px}
+    .prose{padding:18px 18px} .srcTop{padding:12px 14px}
+    .verbatim{padding:14px 16px;font-size:16px}
+    .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+    .chips::-webkit-scrollbar{display:none} .chip{white-space:nowrap}
+    /* 44×44 minimum where a finger is doing the pointing. Desktop keeps the
+       tighter proportions — a 44px icon button next to 13px text looks
+       oversized with a mouse, and mice don't miss. */
+    .go{width:44px;height:44px} .iconbtn{width:44px;height:44px}
+    .chip{min-height:44px;padding:0 16px} .expand{padding:13px 20px} .act{min-height:44px}
+  }
+</style>
+
+<svg class="sr" aria-hidden="true">
+  <defs>
+    <g id="i-check"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-alert"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-x"><path d="M15 9l-6 6m0-6l6 6M12 21a9 9 0 100-18 9 9 0 000 18z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-chev"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-right"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-send"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-stop"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></g>
+    <g id="i-copy"><rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g>
+    <g id="i-scale"><path d="M12 3v18M8 21h8M3 7h18M6 7l-3 6h6L6 7zm12 0l-3 6h6l-3-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-user"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="i-quote"><path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-graph"><path d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></g>
+    <g id="i-sun"><path d="M12 17a5 5 0 100-10 5 5 0 000 10zM12 1v2m0 18v2M4.2 4.2l1.4 1.4m12.8 12.8l1.4 1.4M1 12h2m18 0h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g>
+    <g id="i-moon"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+  </defs>
+</svg>
+
+<header>
+  <div class="hrow">
+    <div class="mark" aria-hidden="true">§</div>
+    <div class="htitle">
+      <h1>DPDP Act 2023 — Compliance Assistant</h1>
+      <div class="meta" id="meta">Connecting…</div>
+    </div>
+    <div class="hspace">
+      <div class="status" id="status"><i></i><span id="statusText">Checking</span></div>
+      <button class="iconbtn" id="theme" aria-label="Toggle dark mode">
+        <svg class="moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="feed">
+  <div class="turn">
+    <div class="welcome">
+      <h2>Ask about India's data protection law in plain English.</h2>
+      <p>This assistant answers from the Digital Personal Data Protection Act, 2023 — quoting
+         the statute verbatim and showing you exactly which provisions support each answer.</p>
+      <div class="keys">
+        <div class="key"><svg aria-hidden="true"><use href="#i-quote"/></svg>
+          <div><b>Verbatim quotation</b><span>Answers quote the Act's own words, never a paraphrase.</span></div></div>
+        <div class="key"><svg aria-hidden="true"><use href="#i-shield"/></svg>
+          <div><b>Every citation checked</b><span>Each reference is resolved against the knowledge graph before you see it.</span></div></div>
+        <div class="key"><svg aria-hidden="true"><use href="#i-scale"/></svg>
+          <div><b>Penalties from the source</b><span>Amounts are read from the graph and never pass through the model.</span></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="cwrap">
+    <div class="chips" id="chips"></div>
+    <div class="box">
+      <label class="sr" for="q">Ask a question about the DPDP Act</label>
+      <textarea id="q" rows="1" placeholder="e.g. our vendor leaked customer phone numbers — what do we have to do?"></textarea>
+      <button class="go" id="go" aria-label="Send question"><svg aria-hidden="true"><use href="#i-send"/></svg></button>
+    </div>
+    <p class="legal">Informational only. Not legal advice — verify every citation against the Act before relying on it.</p>
+  </div>
+</footer>
+
+<script>
+const feed = document.getElementById('feed');
+const box  = document.getElementById('q');
+const go   = document.getElementById('go');
+let busy = false, controller = null;
+
+/* ── theme ────────────────────────────────────────────────────────────── */
+const root = document.documentElement;
+const saved = localStorage.getItem('dpdp-theme');
+if (saved) root.dataset.theme = saved;
+else if (matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+document.getElementById('theme').onclick = () => {
+  const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  root.dataset.theme = next;
+  localStorage.setItem('dpdp-theme', next);
+};
+
+/* ── helpers ──────────────────────────────────────────────────────────── */
+const esc = s => (s ?? '').replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const icon = (id, cls='') => `<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
+const HEAD = /^(Short answer|Why|The law says|What to do|Penalty):/gm;
+
+// Matches the same citation shapes api.py's RE_CITATION parses, so what the
+// backend verified and what the reader can click are the same set.
+const CITE = /(§\s*\d{1,2}(?:\s*\([0-9a-zA-Z]{1,3}\))*)|(\bSchedule\s+(?:entry\s+)?\d\b)/gi;
+
+function renderProse(text, refFor) {
+  let html = esc(text).replace(HEAD, '<h4>$1</h4>');
+  if (refFor) {
+    // Turn each §-reference in the prose into a numbered link to its source
+    // card. Done only once the citations arrive: during streaming the text is
+    // still half-formed and a partial "§8(" would link to nothing.
+    html = html.replace(CITE, m => {
+      const n = refFor(m);
+      return n ? `${m}<a class="ref" href="#src-${n}" data-n="${n}"
+                    aria-label="Jump to source ${n}">${n}</a>` : m;
+    });
+  }
+  return html;
+}
+
+const EXAMPLES = [
+  "what is the fine if customer data leaks?",
+  "can I text my customers marketing offers?",
+  "a kid signed up on our app — what extra rules apply?",
+  "how do I get a company to delete my data?",
+  "we're a tiny startup, do these rules apply to us?",
+  "can we keep data on servers outside India?",
+];
+EXAMPLES.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.type = 'button'; b.textContent = t;
+  b.onclick = () => { box.value = t; resize(); ask(); };
+  document.getElementById('chips').appendChild(b);
+});
+
+fetch('/api/health').then(r => r.json()).then(h => {
+  const s = document.getElementById('status');
+  s.className = 'status ' + (h.ok ? 'on' : 'off');
+  document.getElementById('statusText').textContent = h.ok ? 'Ready' : 'Unavailable';
+  document.getElementById('meta').textContent = h.ok
+    ? `${h.model} · ${h.chunks} provisions · ${h.nodes} graph nodes · build ${h.build_id || '—'}`
+    : h.detail;
+}).catch(() => {
+  document.getElementById('status').className = 'status off';
+  document.getElementById('statusText').textContent = 'Offline';
+  document.getElementById('meta').textContent = 'Backend unreachable';
+});
+
+function resize() {
+  box.style.height = 'auto';
+  box.style.height = Math.min(box.scrollHeight, 180) + 'px';
+}
+box.addEventListener('input', resize);
+box.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); }
+});
+go.onclick = () => busy ? controller?.abort() : ask();
+
+function turn(role, iconId) {
+  const el = document.createElement('div');
+  el.className = 'turn';
+  el.innerHTML = `<div class="role">${icon(iconId)}${role}</div>`;
+  feed.appendChild(el);
+  return el;
+}
+const toBottom = () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+function band(host, title, lede) {
+  const b = document.createElement('div');
+  b.className = 'band';
+  b.innerHTML = `<h3>${esc(title)}</h3>${lede ? `<span class="lede">${esc(lede)}</span>` : ''}`;
+  host.appendChild(b);
+}
+
+/* ── evidence rendering ───────────────────────────────────────────────── */
+function renderSources(host, cites) {
+  const bad = cites.filter(c => c.status !== 'verified').length;
+  band(host, 'Sources', bad
+    ? `${bad} of ${cites.length} need attention`
+    : `All ${cites.length} verified against the Act`);
+
+  cites.forEach((c, i) => {
+    const n = i + 1;
+    const el = document.createElement('article');
+    el.className = 'src s-' + c.status;
+    el.id = 'src-' + n;
+    const label = c.status.replace(/_/g, ' ');
+    const glyph = c.status === 'verified' ? 'i-check'
+                : c.status === 'unresolved' ? 'i-x' : 'i-alert';
+    el.innerHTML = `
+      <div class="srcTop">
+        <span class="num" aria-hidden="true">${n}</span>
+        <span class="cid">${esc(c.label)}</span>
+        <span class="pill">${icon(glyph)}${esc(label)}</span>
+        ${c.headnote ? `<span class="chead">${esc(c.headnote)}</span>` : ''}
+      </div>
+      ${c.text ? `<blockquote class="verbatim">${esc(c.text)}</blockquote>` : ''}
+      ${c.note ? `<div class="flag">${esc(c.note)}</div>` : ''}`;
+    host.appendChild(el);
+
+    // Only offer "read the rest" when there is a rest to read — measured,
+    // not assumed, so short provisions don't get a control that does nothing.
+    const q = el.querySelector('.verbatim');
+    if (q) requestAnimationFrame(() => {
+      if (q.scrollHeight <= q.clientHeight + 2) { q.style.maxHeight = 'none'; return; }
+      const btn = document.createElement('button');
+      btn.className = 'expand'; btn.type = 'button';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-controls', 'src-' + n);
+      btn.innerHTML = `${icon('i-chev')}<span>Read the full provision</span>`;
+      btn.onclick = () => {
+        const open = q.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(open));
+        btn.querySelector('span').textContent = open ? 'Collapse' : 'Read the full provision';
+      };
+      q.insertAdjacentElement('afterend', btn);
+    });
+  });
+}
+
+function renderStatements(host, claims) {
+  const weak = claims.filter(c => c.status === 'unsupported').length;
+  band(host, 'Statement check', weak
+    ? `${weak} statement${weak > 1 ? 's' : ''} not supported by the cited text`
+    : 'Every statement is supported by the cited text');
+  claims.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'stmt ' + c.status;
+    el.innerHTML = `${icon(c.status === 'supported' ? 'i-check' : 'i-alert', 'tick')}
+      <span class="body">${esc(c.claim)}</span>
+      <span class="val">${c.entailment.toFixed(2)}</span>`;
+    host.appendChild(el);
+  });
+}
+
+function renderPenalties(host, rows) {
+  band(host, 'Penalty amounts', 'Read from the knowledge graph, never from the model');
+  const w = document.createElement('div');
+  w.className = 'tblWrap';
+  w.innerHTML = `<div class="tblScroll"><table>
+    <thead><tr><th scope="col">Entry</th><th scope="col">Maximum penalty</th>
+    <th scope="col">Applies to</th></tr></thead>
+    <tbody>${rows.map(p => `<tr><td>${esc(p.entry)}</td><td>${esc(p.amount)}</td>
+      <td>${p.applies_to.length ? esc(p.applies_to.join(', ')) : '—'}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  host.appendChild(w);
+}
+
+function renderTrace(host, d) {
+  const seeds = d.provisions.filter(p => p.hop === 0).length;
+  const det = document.createElement('details');
+  det.className = 'trace';
+  det.innerHTML = `<summary>${icon('i-right')}<span>How this was found —
+    ${seeds} matched directly, ${d.provisions.length - seeds} via the graph,
+    ${d.elapsed_ms} ms${d.vocabulary.length ? ' · read as: ' + esc(d.vocabulary.join(', ')) : ''}
+    </span></summary>
+    <div class="traceIn">${d.provisions.map(p => `
+      <div class="hopRow">
+        <span class="tag t${Math.min(p.hop, 2)}">${p.hop === 0 ? 'match' : 'hop ' + p.hop}</span>
+        <span><b>${esc(p.label)}</b>${p.headnote ? ' — ' + esc(p.headnote) : ''}
+        ${p.via ? `<span class="edge">via ${esc(p.via)}</span>` : ''}</span>
+      </div>`).join('')}</div>`;
+  host.appendChild(det);
+}
+
+/* ── main flow ────────────────────────────────────────────────────────── */
+async function ask() {
+  const question = box.value.trim();
+  if (!question || busy) return;
+  busy = true;
+  go.innerHTML = icon('i-stop');
+  go.setAttribute('aria-label', 'Stop generating');
+  box.value = ''; resize();
+
+  turn('You', 'i-user').insertAdjacentHTML('beforeend',
+    `<div class="ask">${esc(question)}</div>`);
+
+  const host = turn('Assistant', 'i-scale');
+  const card = document.createElement('div');
+  card.className = 'reply';
+  const prose = document.createElement('div');
+  prose.className = 'prose';
+  prose.setAttribute('aria-live', 'polite');
+  prose.innerHTML = '<span class="caret"></span>';
+  card.appendChild(prose);
+  host.appendChild(card);
+  toBottom();
+
+  let text = '';
+  controller = new AbortController();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    // Minimal SSE reader: frames are separated by a blank line, and each frame
+    // carries one `event:` and one `data:` line.
+    //
+    // CRLF is normalised on the way in. sse_starlette terminates lines with
+    // \r\n, so splitting on "\n\n" silently never matches — the stream runs to
+    // completion and renders nothing at all.
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+      let cut;
+      while ((cut = buf.indexOf('\n\n')) !== -1) {
+        const frame = buf.slice(0, cut); buf = buf.slice(cut + 2);
+        const ev = (frame.match(/^event:\s*(.*)$/m) || [, 'message'])[1].trim();
+        const raw = frame.split('\n').filter(l => l.startsWith('data:'))
+                         .map(l => l.slice(5).trim()).join('');
+        if (!raw) continue;
+        const d = JSON.parse(raw);
+
+        if (ev === 'retrieval') {
+          renderTrace(host, d);
+        } else if (ev === 'token') {
+          text += d.t;
+          prose.innerHTML = renderProse(text, null) + '<span class="caret"></span>';
+          toBottom();
+        } else if (ev === 'citations') {
+          // Index citations by label so §8(5) in the prose finds card 1.
+          const byLabel = new Map();
+          d.citations.forEach((c, i) => {
+            byLabel.set(c.label.replace(/\s+/g, '').toLowerCase(), i + 1);
+          });
+          prose.innerHTML = renderProse(text,
+            m => byLabel.get(m.replace(/\s+/g, '').toLowerCase()) || null);
+
+          const bar = document.createElement('div');
+          bar.className = 'actions';
+          const copy = document.createElement('button');
+          copy.className = 'act'; copy.type = 'button';
+          copy.innerHTML = `${icon('i-copy')}<span>Copy answer</span>`;
+          copy.onclick = async () => {
+            await navigator.clipboard.writeText(text);
+            copy.querySelector('span').textContent = 'Copied';
+            setTimeout(() => copy.querySelector('span').textContent = 'Copy answer', 1600);
+          };
+          bar.appendChild(copy);
+          card.appendChild(bar);
+
+          if (d.citations.length) renderSources(host, d.citations);
+          if (d.claims && d.claims.length) renderStatements(host, d.claims);
+          if (d.penalties && d.penalties.length) renderPenalties(host, d.penalties);
+        } else if (ev === 'done') {
+          const f = document.createElement('div');
+          f.className = 'foot';
+          const bits = [esc(d.model), `${(d.elapsed_ms / 1000).toFixed(1)}s`,
+                        `${d.context_chars.toLocaleString()} chars of statute`];
+          if (d.build_id) bits.push('build ' + esc(d.build_id));
+          f.innerHTML = bits.join('<span class="d"></span>');
+          host.appendChild(f);
+        } else if (ev === 'abstain') {
+          card.remove();
+          host.insertAdjacentHTML('beforeend',
+            `<div class="notice warn">${icon('i-alert')}<div>${esc(d.message)}</div></div>`);
+        } else if (ev === 'error') {
+          card.remove();
+          host.insertAdjacentHTML('beforeend',
+            `<div class="notice bad">${icon('i-x')}<div>${esc(d.message)}</div></div>`);
+        }
+      }
+    }
+    prose.querySelector('.caret')?.remove();
+  } catch (e) {
+    prose.querySelector('.caret')?.remove();
+    if (e.name === 'AbortError') {
+      host.insertAdjacentHTML('beforeend',
+        `<div class="notice warn">${icon('i-alert')}<div>Generation stopped.</div></div>`);
+    } else {
+      card.remove();
+      host.insertAdjacentHTML('beforeend',
+        `<div class="notice bad">${icon('i-x')}<div>Request failed: ${esc(e.message)}</div></div>`);
+    }
+  } finally {
+    busy = false; controller = null;
+    go.innerHTML = icon('i-send');
+    go.setAttribute('aria-label', 'Send question');
+    box.focus(); toBottom();
+  }
+}
+
+// Clicking a numbered reference flashes its card, so the eye lands on the
+// right one instead of hunting after the scroll.
+document.addEventListener('click', e => {
+  const ref = e.target.closest('.ref');
+  if (!ref) return;
+  const card = document.getElementById('src-' + ref.dataset.n);
+  if (!card) return;
+  card.classList.add('flash');
+  setTimeout(() => card.classList.remove('flash'), 1400);
+});
+
+box.focus();
+</script>

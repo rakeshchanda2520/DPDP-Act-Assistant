@@ -1,0 +1,6 @@
+Lossless round-trip: every node's verbatim text reassembled in document
+order and compared against the raw body stream.
+
+source chars : 58740
+rebuilt chars: 58740
+identical    : True
