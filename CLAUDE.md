@@ -15,6 +15,7 @@ All commands run from `KG/`.
 pip install pdfplumber networkx rank_bm25 pyyaml neo4j snowballstemmer fastapi uvicorn sse_starlette
 ollama pull qwen2.5:3b-instruct   # or qwen2.5:7b-instruct for materially better answers; see providers below
 pip install sentence-transformers torch   # optional, only for --hybrid / DPDP_HYBRID=1
+pip install langfuse                      # optional, only if LANGFUSE_PUBLIC_KEY/SECRET_KEY are set
 
 # Full rebuild (PDF -> graph -> search index)
 python build.py --neo4j     # PDF -> graph; --neo4j also loads into Neo4j (needs .env)
@@ -52,6 +53,7 @@ There is no single-test flag — `test_build.py` is a flat script of `test_*` fu
 - **Ollama must be running** (`ollama serve`) for `index.py --plain` and any non-`--retrieval-only` answer path when `DPDP_PROVIDER=ollama`. With `DPDP_PROVIDER=claude`, `ANTHROPIC_API_KEY` must be set instead — no local server needed. Retrieval-only paths (`build.py`, `index.py` without `--plain`, `ask.py --retrieval-only`, `test_build.py`) never call any provider.
 - **A 3B local model is the current default** (`DPDP_MODEL=qwen2.5:3b-instruct`) and is the known weak link — it has misread Schedule penalty figures and glossed over legal nuance (e.g. conflating "family" with "nominated person" under §14). Retrieval is not the bottleneck; the model is. `answer_eval.yaml` has permanent regression cases for both errors. Prefer `DPDP_PROVIDER=claude` or `qwen2.5:7b-instruct` for anything beyond a quick smoke test.
 - **Hybrid retrieval (`hybrid.py`) is off by default** (`DPDP_HYBRID=1` or `ask.py --hybrid` to enable). Needs `sentence-transformers` + `torch` and two locally-cached HF models (`sentence-transformers/all-MiniLM-L6-v2`, `cross-encoder/ms-marco-MiniLM-L-6-v2`) — `hybrid.py` forces `HF_HUB_OFFLINE=1` by default so a slow/absent network doesn't stall every startup; set `DPDP_HF_ONLINE=1` the first time a model isn't cached yet. Measured, not assumed better: 92/101 on `eval.yaml` vs BM25-only's 90/101, cutting `known_miss` cases from 11 to 5, but with its own new misses on a few previously-easy exact-match questions — see the comparison methodology and the code comments in `ask.py`'s `retrieve()` before changing the reranker's candidate text; a plausible-looking "improvement" there was measured to make things *worse* (85/101) and was reverted.
+- **Langfuse tracing (`observability.py`) is off unless `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY` are both set** (`LANGFUSE_BASE_URL` optional, defaults to Langfuse Cloud). When on, every `/api/chat` request becomes one Langfuse trace with three nested observations — `retrieve` (retriever), `generate` (generation), `verify_citations` (evaluator) — matching the three SSE stages and `audit_log.jsonl`'s own record shape. `observability.trace()`/`observability.step()` are context managers that yield `None` and do nothing when disabled — callers never branch on `observability.ENABLED` directly, and the `langfuse` package is only imported the first time one of them actually needs it. Verified resilient to a misconfigured or unreachable Langfuse endpoint: `check()` (surfaced in `/api/health`'s `tracing` field) reports the failure without raising, and a request still completes normally (span export just logs a warning and gives up) — tracing failures must never take down the actual assistant.
 - **The abstention gate in `api.py`** (`should_abstain`, threshold `ABSTAIN_THRESHOLD`) is a first-line filter, not a complete out-of-domain classifier — it catches clearly unrelated questions but not adjacent-domain ones (GDPR/HIPAA-style questions score as high as genuine DPDP questions on BM25 because they share real legal vocabulary). This is documented, not hidden, in the code comment next to the threshold.
 
 ## Architecture
@@ -65,6 +67,7 @@ build.py  → out/dpdp_tree.json, out/dpdp_graph.json, out/schedule.json,
 index.py  → out/index.json (142 BM25 chunks); --plain also writes plain_language.json
 llm.py    → pluggable provider (Ollama default / Claude) — chat, chat_stream, check, models
 hybrid.py → optional dense retrieval: embeddings + RRF fusion + cross-encoder rerank
+observability.py → optional Langfuse tracing, on only if credentials are set
 ask.py    → CLI: question -> vocab.yaml expansion -> BM25(+hybrid) -> 2-hop graph
             expansion -> cited answer
 api.py    → FastAPI: same retrieval as ask.py, streamed over SSE, plus citation

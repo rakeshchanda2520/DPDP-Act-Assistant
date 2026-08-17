@@ -43,6 +43,7 @@ from sse_starlette.sse import EventSourceResponse
 
 import ask
 import llm
+import observability
 
 ROOT = Path(__file__).parent
 WEB = ROOT / "web"
@@ -222,7 +223,9 @@ def health() -> dict:
             "detail": error or "ready",
             "chunks": len(STATE["index"]["chunks"]),
             "nodes": len(STATE["graph"]["nodes"]),
-            "build_id": STATE["build_id"]}
+            "build_id": STATE["build_id"],
+            "tracing": {"enabled": observability.ENABLED,
+                       "detail": observability.check() or ("ready" if observability.ENABLED else "not configured")}}
 
 
 @app.get("/api/provision/{node_id}")
@@ -243,116 +246,169 @@ async def chat(q: Question) -> EventSourceResponse:
     request_id = uuid.uuid4().hex[:12]
 
     async def stream():
-        # 1. Retrieve. Send it immediately — it is instant, and showing which
-        #    provisions were found makes the wait legible instead of blank.
-        results, trace = await asyncio.to_thread(
-            ask.retrieve, STATE["index"], STATE["graph"], STATE["vocab"], q.question, q.k,
-            q.parent_doc, q.hybrid)
-        if not results:
-            audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
-                      "build_id": STATE["build_id"], "outcome": "no_results"})
-            yield {"event": "error",
-                   "data": json.dumps({"message":
-                                       "Nothing in this Act matches that question."})}
-            return
+        # One Langfuse trace per request, with a child observation per stage
+        # — deliberately the same three stages as the SSE events and
+        # audit_log.jsonl, so a trace in the Langfuse UI, the browser network
+        # tab, and a line in the local audit log all describe one request the
+        # same way. A no-op everywhere Langfuse isn't configured (see
+        # observability.py) — this function's control flow is identical
+        # whether tracing is on or off.
+        with observability.trace(
+            "dpdp.answer", input=q.question,
+            metadata={"request_id": request_id, "k": q.k,
+                     "parent_doc": q.parent_doc, "hybrid": q.hybrid}) as root:
 
-        retrieved_ids = {r["node_id"] for r in results}
-        yield {"event": "retrieval", "data": json.dumps({
-            "vocabulary": trace["vocab_hits"],
-            "intents": trace["intents"],
-            "elapsed_ms": int((time.time() - started) * 1000),
-            "build_id": STATE["build_id"],
-            "provisions": [{
-                "id": r["node_id"], "label": r["label"], "kind": r["kind"],
-                "headnote": r.get("headnote", ""), "hop": r["hop"],
-                "score": r["score"], "via": r.get("via", ""),
-            } for r in results],
-        })}
+            # 1. Retrieve. Send it immediately — it is instant, and showing
+            #    which provisions were found makes the wait legible instead
+            #    of blank.
+            with observability.step("retrieve", as_type="retriever",
+                                    input=q.question) as retr_span:
+                results, trace = await asyncio.to_thread(
+                    ask.retrieve, STATE["index"], STATE["graph"], STATE["vocab"],
+                    q.question, q.k, q.parent_doc, q.hybrid)
+                if retr_span:
+                    retr_span.update(output=[r["node_id"] for r in results],
+                                     metadata={"vocab_hits": trace["vocab_hits"],
+                                              "intents": trace["intents"]})
 
-        # 1a. Abstain before spending a generation call on a question this Act
-        # plainly does not cover — see should_abstain's docstring for why this
-        # is a threshold, not a judgement call left to the model.
-        if reason := should_abstain(results):
-            audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
-                      "build_id": STATE["build_id"], "outcome": "abstained", "reason": reason,
-                      "top_score": max((r["score"] for r in results if r["hop"] == 0), default=0.0)})
-            yield {"event": "abstain", "data": json.dumps({
-                "message": "This doesn't look like something the Digital Personal Data "
-                          "Protection Act, 2023 covers — the closest match in the Act "
-                          "was too weak to answer from. Try rephrasing, or this may be "
-                          "outside this Act's scope entirely.",
-                "reason": reason,
-            })}
-            return
-
-        if error := llm.check():
-            audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
-                      "build_id": STATE["build_id"], "outcome": "llm_unavailable", "error": error})
-            yield {"event": "error", "data": json.dumps({"message": error})}
-            return
-
-        # 2. Stream the answer.
-        prompt = f"{ask.build_context(results)}\n\nQuestion: {q.question}"
-        chunks: list[str] = []
-        queue: asyncio.Queue = asyncio.Queue()
-        loop = asyncio.get_running_loop()
-
-        def produce() -> None:
-            try:
-                for fragment in llm.chat_stream(prompt, system=ask.SYSTEM,
-                                                num_ctx=ask.ANSWER_NUM_CTX,
-                                                temperature=0.1):
-                    loop.call_soon_threadsafe(queue.put_nowait, ("token", fragment))
-            except RuntimeError as e:
-                loop.call_soon_threadsafe(queue.put_nowait, ("error", str(e)))
-            finally:
-                loop.call_soon_threadsafe(queue.put_nowait, ("eof", None))
-
-        asyncio.get_running_loop().run_in_executor(None, produce)
-
-        while True:
-            kind, payload = await queue.get()
-            if kind == "eof":
-                break
-            if kind == "error":
+            if not results:
                 audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
-                          "build_id": STATE["build_id"], "outcome": "generation_error",
-                          "error": payload})
-                yield {"event": "error", "data": json.dumps({"message": payload})}
+                          "build_id": STATE["build_id"], "outcome": "no_results"})
+                if root:
+                    root.update(output="no_results", level="WARNING")
+                observability.flush()
+                yield {"event": "error",
+                       "data": json.dumps({"message":
+                                           "Nothing in this Act matches that question."})}
                 return
-            chunks.append(payload)
-            yield {"event": "token", "data": json.dumps({"t": payload})}
 
-        # 3. Check what it cited, and hand back the amounts from the graph.
-        answer = "".join(chunks)
-        citations = check_citations(answer, retrieved_ids)
-        elapsed_ms = int((time.time() - started) * 1000)
-        yield {"event": "citations", "data": json.dumps({
-            "citations": citations,
-            "penalties": penalty_facts(results),
-        })}
-        yield {"event": "done", "data": json.dumps({
-            "elapsed_ms": elapsed_ms,
-            "model": llm.MODEL,
-            "provider": llm.PROVIDER,
-            "build_id": STATE["build_id"],
-            "context_chars": len(prompt),
-        })}
+            retrieved_ids = {r["node_id"] for r in results}
+            yield {"event": "retrieval", "data": json.dumps({
+                "vocabulary": trace["vocab_hits"],
+                "intents": trace["intents"],
+                "elapsed_ms": int((time.time() - started) * 1000),
+                "build_id": STATE["build_id"],
+                "provisions": [{
+                    "id": r["node_id"], "label": r["label"], "kind": r["kind"],
+                    "headnote": r.get("headnote", ""), "hop": r["hop"],
+                    "score": r["score"], "via": r.get("via", ""),
+                } for r in results],
+            })}
 
-        # Everything needed to reconstruct and investigate this answer later:
-        # what was retrieved, what was sent to the model, what it said, and
-        # how each citation resolved. This is the record a "your tool told me
-        # X yesterday, was that right?" complaint gets investigated against.
-        audit_log({
-            "request_id": request_id, "ts": time.time(), "question": q.question,
-            "build_id": STATE["build_id"], "outcome": "answered",
-            "model": llm.MODEL, "provider": llm.PROVIDER,
-            "elapsed_ms": elapsed_ms, "context_chars": len(prompt),
-            "retrieved": [{"id": r["node_id"], "hop": r["hop"], "score": r["score"]}
-                         for r in results],
-            "answer": answer,
-            "citations": [{"id": c["id"], "status": c["status"]} for c in citations],
-        })
+            # 1a. Abstain before spending a generation call on a question this
+            # Act plainly does not cover — see should_abstain's docstring for
+            # why this is a threshold, not a judgement call left to the model.
+            if reason := should_abstain(results):
+                audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                          "build_id": STATE["build_id"], "outcome": "abstained", "reason": reason,
+                          "top_score": max((r["score"] for r in results if r["hop"] == 0), default=0.0)})
+                if root:
+                    root.update(output=f"abstained: {reason}", level="WARNING")
+                observability.flush()
+                yield {"event": "abstain", "data": json.dumps({
+                    "message": "This doesn't look like something the Digital Personal Data "
+                              "Protection Act, 2023 covers — the closest match in the Act "
+                              "was too weak to answer from. Try rephrasing, or this may be "
+                              "outside this Act's scope entirely.",
+                    "reason": reason,
+                })}
+                return
+
+            if error := llm.check():
+                audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                          "build_id": STATE["build_id"], "outcome": "llm_unavailable", "error": error})
+                if root:
+                    root.update(output=f"llm_unavailable: {error}", level="ERROR")
+                observability.flush()
+                yield {"event": "error", "data": json.dumps({"message": error})}
+                return
+
+            # 2. Stream the answer.
+            prompt = f"{ask.build_context(results)}\n\nQuestion: {q.question}"
+            chunks: list[str] = []
+            queue: asyncio.Queue = asyncio.Queue()
+            loop = asyncio.get_running_loop()
+
+            def produce() -> None:
+                try:
+                    for fragment in llm.chat_stream(prompt, system=ask.SYSTEM,
+                                                    num_ctx=ask.ANSWER_NUM_CTX,
+                                                    temperature=0.1):
+                        loop.call_soon_threadsafe(queue.put_nowait, ("token", fragment))
+                except RuntimeError as e:
+                    loop.call_soon_threadsafe(queue.put_nowait, ("error", str(e)))
+                finally:
+                    loop.call_soon_threadsafe(queue.put_nowait, ("eof", None))
+
+            with observability.step("generate", as_type="generation", model=llm.MODEL,
+                                    input=prompt) as gen_span:
+                asyncio.get_running_loop().run_in_executor(None, produce)
+
+                while True:
+                    kind, payload = await queue.get()
+                    if kind == "eof":
+                        break
+                    if kind == "error":
+                        audit_log({"request_id": request_id, "ts": time.time(), "question": q.question,
+                                  "build_id": STATE["build_id"], "outcome": "generation_error",
+                                  "error": payload})
+                        if gen_span:
+                            gen_span.update(level="ERROR", status_message=payload)
+                        if root:
+                            root.update(output=f"generation_error: {payload}", level="ERROR")
+                        observability.flush()
+                        yield {"event": "error", "data": json.dumps({"message": payload})}
+                        return
+                    chunks.append(payload)
+                    yield {"event": "token", "data": json.dumps({"t": payload})}
+
+                answer = "".join(chunks)
+                if gen_span:
+                    gen_span.update(output=answer)
+
+            # 3. Check what it cited, and hand back the amounts from the graph.
+            with observability.step("verify_citations", as_type="evaluator",
+                                    input=answer) as verify_span:
+                citations = check_citations(answer, retrieved_ids)
+                if verify_span:
+                    verify_span.update(output=[{"id": c["id"], "status": c["status"]}
+                                               for c in citations])
+
+            elapsed_ms = int((time.time() - started) * 1000)
+            yield {"event": "citations", "data": json.dumps({
+                "citations": citations,
+                "penalties": penalty_facts(results),
+            })}
+            yield {"event": "done", "data": json.dumps({
+                "elapsed_ms": elapsed_ms,
+                "model": llm.MODEL,
+                "provider": llm.PROVIDER,
+                "build_id": STATE["build_id"],
+                "context_chars": len(prompt),
+            })}
+
+            if root:
+                root.update(output=answer, metadata={
+                    "citation_statuses": [c["status"] for c in citations],
+                    "elapsed_ms": elapsed_ms})
+            observability.flush()
+
+            # Everything needed to reconstruct and investigate this answer
+            # later: what was retrieved, what was sent to the model, what it
+            # said, and how each citation resolved. This is the record a
+            # "your tool told me X yesterday, was that right?" complaint gets
+            # investigated against — the local, always-on counterpart to
+            # whatever the Langfuse trace above captured, if it's configured.
+            audit_log({
+                "request_id": request_id, "ts": time.time(), "question": q.question,
+                "build_id": STATE["build_id"], "outcome": "answered",
+                "model": llm.MODEL, "provider": llm.PROVIDER,
+                "elapsed_ms": elapsed_ms, "context_chars": len(prompt),
+                "retrieved": [{"id": r["node_id"], "hop": r["hop"], "score": r["score"]}
+                             for r in results],
+                "answer": answer,
+                "citations": [{"id": c["id"], "status": c["status"]} for c in citations],
+            })
 
     return EventSourceResponse(stream())
 
